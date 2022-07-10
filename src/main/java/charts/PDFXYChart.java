@@ -27,6 +27,10 @@ public class PDFXYChart {
     private float chartHeight = 200;
     // entire width of the chart
     private float chartWidth = 550;
+    // bottom left x coordinate chart starts on
+    private float xStart = 32;
+    // bottom left y coordinate chart starts on
+    private float yStart = 500;
     // distance calculated for the size of the bars using given table height
     private float tableBarHeightSpacing;
     // distance between gridlines
@@ -36,7 +40,7 @@ public class PDFXYChart {
     // determines if you want gridlines
     private boolean gridLinesVisable = true;
     // chart takes entire space between margins
-    private boolean autoFitToPage = true;
+    private boolean autoFitWidthToMargins = true;
     // ratio of the space between the bars to the size of the bars
     private float barSpaceRatio = 0.3f;
     // ratio of all the bars to the entire width of the chart
@@ -45,10 +49,7 @@ public class PDFXYChart {
     private float pageMarginWidthSizeRatio = 0.15095f;
     // xcordinate that the bars start on
     private float barStartPoint;
-    // bottom left x coordinate chart starts on
-    private float xStart = 32;
-    // bottom left y coordinate chart starts on
-    private float yStart = 500;
+
 
     // the increment values marked for each gridline
     private float scale;
@@ -72,7 +73,7 @@ public class PDFXYChart {
         this.gridLineDistance = chartHeight / multiple;
         this.yIncrement = scale / multiple;
         System.out.println("gridLineDistance= " + gridLineDistance);
-        if(autoFitToPage) {
+        if(autoFitWidthToMargins) {
             getPDFSize(pdfCanvas);
             getXStart();
             getChartWidth();
@@ -84,9 +85,6 @@ public class PDFXYChart {
         createGridLines();
         setYscaleText();
         createBars(pdfCanvas);
-    }
-
-    private void checkSettings() {
     }
 
     private void setYscaleText() {
@@ -206,8 +204,28 @@ public class PDFXYChart {
         return b;
     }
 
+    /**
+     * Sets the width of the table
+     * @param chartWidth
+     */
     public void setChartWidth(float chartWidth) {
+        autoFitWidthToMargins = false;
         this.chartWidth = chartWidth;
     }
 
+    /**
+     * Sets the color of the bars
+     * @param barColor
+     */
+    public void setBarColor(DeviceCmyk barColor) {
+        this.barColor = barColor;
+    }
+
+    /**
+     *  Sets page margins that the chart will respect
+     * @param pageMarginWidthSizeRatio
+     */
+    public void setPageMarginWidthSizeRatio(float pageMarginWidthSizeRatio) {
+        this.pageMarginWidthSizeRatio = pageMarginWidthSizeRatio;
+    }
 }
