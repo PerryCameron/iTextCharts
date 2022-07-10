@@ -26,9 +26,9 @@ public class PDFXYChart {
     // this is the height given for the chart, does not include legend or numbers (200 default)
     private float chartHeight = 200;
     // entire width of the chart
-    private float chartWidth = 550;
+    private float chartWidth = 0;
     // bottom left x coordinate chart starts on
-    private float xStart = 32;
+    private float xStart = 0;
     // bottom left y coordinate chart starts on
     private float yStart = 500;
     // distance calculated for the size of the bars using given table height
@@ -40,8 +40,8 @@ public class PDFXYChart {
     // determines if you want gridlines
     private boolean gridLinesVisable = true;
     // chart takes entire space between margins
-    private boolean autoFitWidthToMargins = true;
-    // ratio of the space between the bars to the size of the bars
+//    private boolean autoFitWidthToMargins = true;
+//    // ratio of the space between the bars to the size of the bars
     private float barSpaceRatio = 0.3f;
     // ratio of all the bars to the entire width of the chart
     private float barChartRatio = 0.95f;
@@ -66,18 +66,14 @@ public class PDFXYChart {
     }
 
     public void stroke() {
+        printValues();
         this.multiple = 6;
         this.scale = getScale(getLargestStat());
         this.tableBarHeightSpacing = scale * multiple;
-        System.out.println("tableBarHeightSpacing= " + tableBarHeightSpacing);
         this.gridLineDistance = chartHeight / multiple;
         this.yIncrement = scale / multiple;
-        System.out.println("gridLineDistance= " + gridLineDistance);
-        if(autoFitWidthToMargins) {
-            getPDFSize(pdfCanvas);
-            getXStart();
-            getChartWidth();
-        }
+        if(chartWidth == 0) setChartWidth();
+        if(xStart == 0) getXStart();
         calculateBarSize();
         calculateBarStartPoint();
         createXScale();
@@ -85,6 +81,22 @@ public class PDFXYChart {
         createGridLines();
         setYscaleText();
         createBars(pdfCanvas);
+    }
+
+    /**
+     *  Temporary method for testing values
+     */
+    private void printValues() {
+        getPDFSize();
+        System.out.println("pdfPageWidth: " + pdfPageWidth);
+        System.out.println("pdfPageHeight: " + pdfPageHeight);
+        System.out.println("chartWidth: " + chartWidth);
+        System.out.println("chartHeight: " + chartHeight);
+        System.out.println("tableBarHeightSpacing: " + tableBarHeightSpacing);
+        System.out.println("gridLineDistance: " + gridLineDistance);
+        System.out.println("Bar start point= " + barStartPoint);
+        System.out.println("scaleSize(5,10,50,100 etc.)= " + scale);
+        System.out.println(("pageMarginWidthSizeRatio: " + pageMarginWidthSizeRatio));
     }
 
     private void setYscaleText() {
@@ -100,26 +112,26 @@ public class PDFXYChart {
         }
     }
 
-    private void getChartWidth() {
-        chartWidth = pdfPageWidth - (pdfPageWidth * pageMarginWidthSizeRatio) *2;
-        System.out.println("chartWidth= " + chartWidth);
+    /**
+     * overloaded method, but this on is private and only used internally
+     */
+    private void setChartWidth() {
+        chartWidth = pdfPageWidth - (pdfPageWidth * pageMarginWidthSizeRatio) * 2;
     }
 
     private void getXStart() {
         xStart = pdfPageWidth * pageMarginWidthSizeRatio;
     }
 
-    private void getPDFSize(PdfCanvas pdfCanvas) {
+    private void getPDFSize() {
         Rectangle thisPage = pdfCanvas.getDocument().getPage(1).getPageSize();
         this.pdfPageHeight = thisPage.getHeight();
         this.pdfPageWidth = thisPage.getWidth();
-        System.out.println("Page Width= " + pdfPageWidth);
     }
 
     private float calculateBarStartPoint() {
         // starting point of the chart plus the amount you want to inset
         barStartPoint = xStart + (chartWidth * ((1 - barChartRatio) / 2));
-        System.out.println("Bar start point= " + barStartPoint);
         return barStartPoint;
     }
 
@@ -156,7 +168,6 @@ public class PDFXYChart {
 
     private float getScale(int largestColumn) {
         float scaleSize = getScaleSize(largestColumn);
-        System.out.println("scaleSize(5,10,50,100 etc.)= " + scaleSize);
         return scaleSize;
     }
 
@@ -209,7 +220,6 @@ public class PDFXYChart {
      * @param chartWidth
      */
     public void setChartWidth(float chartWidth) {
-        autoFitWidthToMargins = false;
         this.chartWidth = chartWidth;
     }
 

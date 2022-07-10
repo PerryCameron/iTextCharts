@@ -44,7 +44,7 @@ public class XYChartExample {
 
         PDFXYChart chart1 = new PDFXYChart(page);
         chart1.setChartHeight(200);
-        chart1.setChartWidth(300);
+//        chart1.setChartWidth(300);
         chart1.stroke();
 
         Document document = new Document(pdf);
