@@ -10,7 +10,7 @@ import com.itextpdf.layout.properties.TextAlignment;
 import scaling.BarColors;
 import scaling.ChartScale;
 
-public class PDFXYChart {
+public class BarChart {
     // test data
     private String[] xaxisData;
     private float[] yaxisData;
@@ -61,7 +61,7 @@ public class PDFXYChart {
 
     private float titleFontSize = 20;
 
-    public PDFXYChart(PdfPage page) {
+    public BarChart(PdfPage page) {
         this.pdfCanvas = new PdfCanvas(page);
     }
 
