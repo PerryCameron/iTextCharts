@@ -7,19 +7,16 @@ import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.properties.TextAlignment;
+import scaling.ChartScale;
 
 public class PDFXYChart {
     // test data
-    private int[] xaxisData;
-    private  int[] yaxisData;
+    private float[] xaxisData;
+    private  float[] yaxisData;
 
     private DeviceCmyk barColor = new DeviceCmyk(.12f, .05f, 0, 0.02f);
     private DeviceCmyk gridLineColor = new DeviceCmyk(.12f, .05f, 0, 0.02f);
     private DeviceCmyk xAxisColor = new DeviceCmyk(0, 0, 0, 100);
-
-    public void setChartHeight(float chartHeight) {
-        this.chartHeight = chartHeight;
-    }
 
     // this is the height given for the chart, does not include legend or numbers (200 default)
     private float chartHeight = 200;
@@ -29,17 +26,11 @@ public class PDFXYChart {
     private float xStart = 0;
     // bottom left y coordinate chart starts on
     private float yStart = 0;
-    // distance calculated for the size of the bars using given table height
-    private float tableBarHeightSpacing;
     // distance between gridlines
     private float gridLineDistance;
-    // size of the bars in relation to data, is a ratio
-    private float multiple = 6;
     // determines if you want gridlines
     private boolean gridLinesVisable = true;
-    // chart takes entire space between margins
-//    private boolean autoFitWidthToMargins = true;
-//    // ratio of the space between the bars to the size of the bars
+    // ratio of the space between the bars to the size of the bars
     private float barSpaceRatio = 0.3f;
     // ratio of all the bars to the entire width of the chart
     private float barChartRatio = 0.95f;
@@ -47,12 +38,9 @@ public class PDFXYChart {
     private float pageMarginWidthSizeRatio = 0.15095f;
     // xcordinate that the bars start on
     private float barStartPoint;
+    // object to make a nice looking scale
+    private ChartScale numScale;
 
-
-    // the increment values marked for each gridline
-    private float scale;
-
-    private float yIncrement;
     private PdfCanvas pdfCanvas;
     private float barWidth;
     private float spacerWidth;
@@ -64,11 +52,10 @@ public class PDFXYChart {
     }
 
     public void stroke() {
-        printValues();
-        this.scale = getScale(getLargestStat());
-        this.tableBarHeightSpacing = scale * multiple;
-        this.gridLineDistance = chartHeight / multiple;
-        this.yIncrement = scale / multiple;
+        getPDFSize();
+        this.numScale = getGridLineSpacing();
+        printNumScaleValues();
+        this.gridLineDistance = chartHeight / (float) numScale.getNumberOfTics();
         if(chartWidth == 0) setChartWidth();
         if(xStart == 0) getXStart();
         if(yStart == 0) getYStart();
@@ -78,6 +65,7 @@ public class PDFXYChart {
         if(gridLinesVisable)
         createGridLines();
         setYscaleText();
+        printValues();
         createBars(pdfCanvas);
     }
 
@@ -85,27 +73,37 @@ public class PDFXYChart {
      *  Temporary method for testing values
      */
     private void printValues() {
-        getPDFSize();
         System.out.println("pdfPageWidth: " + pdfPageWidth);
         System.out.println("pdfPageHeight: " + pdfPageHeight);
         System.out.println("chartWidth: " + chartWidth);
         System.out.println("chartHeight: " + chartHeight);
-        System.out.println("tableBarHeightSpacing: " + tableBarHeightSpacing);
         System.out.println("gridLineDistance: " + gridLineDistance);
         System.out.println("Bar start point= " + barStartPoint);
-        System.out.println("scaleSize(5,10,50,100 etc.)= " + scale);
         System.out.println(("pageMarginWidthSizeRatio: " + pageMarginWidthSizeRatio));
+        System.out.println("BarWidth " + barWidth);
+        System.out.println("SpacerWidth= " + spacerWidth);
+    }
+
+    private void printNumScaleValues() {
+        System.out.println("<-----------numScale--------------->");
+        System.out.println("minPoint= " + numScale.getMinPoint());
+        System.out.println("maxPoint= " + numScale.getMaxPoint());
+        System.out.println("tickSpacing= " + numScale.getTickSpacing());
+        System.out.println("range= " + numScale.getRange());
+        System.out.println("niceMax= " + numScale.getNiceMax());
+        System.out.println("niceMin= " + numScale.getNiceMin());
+        System.out.println("numberOfTics= " + numScale.getNumberOfTics());
     }
 
     private void setYscaleText() {
         int increment = 0;
         float ycordinate = yStart - 12;
-        for(int i = 0; i < multiple + 1; i++) {
+        for(int i = 0; i < numScale.getNumberOfTics() + 1; i++) {
             Rectangle rectangle = new Rectangle(36,ycordinate , 50, 24);
             Canvas canvas = new Canvas(pdfCanvas, rectangle);
             canvas.add(new Paragraph(String.valueOf(increment)).setTextAlignment(TextAlignment.RIGHT).setStrokeColor(xAxisColor));
             canvas.close();
-            increment += yIncrement;
+            increment += numScale.getTickSpacing();
             ycordinate += gridLineDistance;
         }
     }
@@ -149,7 +147,9 @@ public class PDFXYChart {
     }
 
     private float calculateBarHeight(float height) {
-        return height * ((chartHeight * multiple) / tableBarHeightSpacing);
+        // will determine the value of 1 part
+        float barPart = (float) (chartHeight / numScale.getNiceMax());
+        return (float) (height * barPart);  // not quite right, i fucked this up
     }
 
     /**
@@ -164,18 +164,13 @@ public class PDFXYChart {
 
     private void createGridLines() {
         float scaleHeight = yStart;
-        for(int i = 0; i < multiple; i++) {
+        for(int i = 0; i < numScale.getNumberOfTics(); i++) {
             pdfCanvas.setStrokeColor(gridLineColor);
             scaleHeight = scaleHeight + gridLineDistance;
             pdfCanvas.moveTo(xStart, scaleHeight);
             pdfCanvas.lineTo(xStart + chartWidth, scaleHeight);
             pdfCanvas.closePathStroke();
         }
-    }
-
-    private float getScale(int largestColumn) {
-        float scaleSize = getScaleSize(largestColumn);
-        return scaleSize;
     }
 
     private float getNumberOfBars() {
@@ -185,41 +180,32 @@ public class PDFXYChart {
     private void calculateBarSize() {
         // divide 90% of chartWidth by the number of bars
         float barsAndSpacers = (chartWidth * barChartRatio) / (getNumberOfBars());
-        System.out.println("Bar + Spacer Size= " + barsAndSpacers);
-        // this will give the width of 1 bar + 1 spacer
+        // this will give the width of space between bars
         this.spacerWidth = barsAndSpacers * barSpaceRatio;
-        System.out.println("Spacer Size= " + spacerWidth);
+        // this gives the width of a bar
         this.barWidth = barsAndSpacers * (1 - barSpaceRatio);
-        System.out.println("Bar Size= " + barWidth);
-        // then split that number up
-//        chartWidth
     }
 
-    private int getLargestStat() {
-        int largestSize = 0;
-        for(int height: yaxisData) {
-            if(height > largestSize)
-                largestSize = height;
+    private float[] getMinMaxStats() {
+        float maxSize = yaxisData[0];
+        float minSize = yaxisData[0];
+        float result[] = new float[2];
+        for(float height: yaxisData) {
+            if(height > maxSize)
+                maxSize = height;
+            if(height < minSize)
+                minSize = height;
+            
         }
-        return largestSize;
+        result[0] = minSize;
+        result[1] = maxSize;
+        return result;
     }
 
-    private int getScaleSize(int number) {
-        int scaleSize = 0;
-        if(number < 50) scaleSize = round (number, 5);
-        else if(number < 100) scaleSize = round(number,10);
-        else if(number < 500) scaleSize = round(number,50);
-        else if(number < 1000) scaleSize = round(number,100);
-        return scaleSize;
-    }
-
-    private int round(int n, int roundBy)
-    {
-        // Smaller multiple
-        int a = (n / roundBy) * roundBy;
-        // Larger multiple
-        int b = a + roundBy;
-        return b;
+    private ChartScale getGridLineSpacing() {
+        float minmax[] = getMinMaxStats();
+        ChartScale numScale = new ChartScale(minmax[0], minmax[1]);
+        return numScale;
     }
 
     /**
@@ -250,11 +236,11 @@ public class PDFXYChart {
         this.pageMarginWidthSizeRatio = pageMarginWidthSizeRatio;
     }
 
-    public void setXaxisData(int[] xaxisData) {
+    public void setXaxisData(float[] xaxisData) {
         this.xaxisData = xaxisData;
     }
 
-    public void setYaxisData(int[] yaxisData) {
+    public void setYaxisData(float[] yaxisData) {
         this.yaxisData = yaxisData;
     }
 
@@ -262,5 +248,8 @@ public class PDFXYChart {
         this.yStart = yStart;
     }
 
+    public void setChartHeight(float chartHeight) {
+        this.chartHeight = chartHeight;
+    }
 
 }
