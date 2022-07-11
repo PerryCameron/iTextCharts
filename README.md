@@ -8,5 +8,5 @@ and many more.
 
 ## XY Chart
 <p>
-    <img src="https://github.com/PerryCameron/iTextCharts/blob/main/src/main/resources/screenshots/Screen%20Shot%202022-07-10%20at%208.47.32%20PM.png"  />
+    <img src="https://github.com/PerryCameron/iTextCharts/blob/main/src/main/resources/screenshots/Screen%20Shot%202022-07-11%20at%205.54.37%20PM.png"  />
 </p>
