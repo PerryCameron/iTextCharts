@@ -38,20 +38,20 @@ public class BarChartExample {
         float[] yaxis = { 21, 19, 18, 15, 13, 27, 17, 19, 20, 15, 24, 17, 21, 18,
                 23, 26, 15, 17, 28, 15, 7};
         BarChart chart1 = new BarChart(page);
-        chart1.getBarColors().setBarColor(new DeviceCmyk(.12f, .05f, 0, 0.02f));
+        chart1.getChartColors().setBarColor(new DeviceCmyk(.12f, .05f, 0, 0.02f));
         chart1.setChartHeight(200);
         chart1.setXaxisData(xaxis);
         chart1.setYaxisData(yaxis);
         chart1.setVerticalHeight(550);
         chart1.setTitleFontSize(20);
-        chart1.setGridLineColor(new DeviceCmyk(64,0,6,3));
+        chart1.getChartColors().setGridLineColor(new DeviceCmyk(64,0,6,3));
         chart1.setTitle("New Members By Year");
         chart1.stroke();
 
         String[] xaxis1 = { "Guppy", "Goldfish", "Oscar", "Swordfish", "Shark" };
         float[] yaxis1 = { 101, 123, 78, 234, 102 };
         BarChart chart2 = new BarChart(page);
-        chart2.getBarColors().setMultiColored(true);
+        chart2.getChartColors().setMultiColoredBars(true);
         chart2.setChartHeight(300);
         chart2.setXaxisData(xaxis1);
         chart2.setYaxisData(yaxis1);

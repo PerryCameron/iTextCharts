@@ -4,14 +4,17 @@ import com.itextpdf.kernel.colors.DeviceCmyk;
 
 import java.util.ArrayList;
 
-public class BarColors {
+public class ChartColors {
 
     ArrayList<DeviceCmyk> barColors;
+    private DeviceCmyk gridLineColor = new DeviceCmyk(.12f, .05f, 0, 0.02f);
+    private DeviceCmyk scaleColor = new DeviceCmyk(0, 0, 0, 100);
+
     int numberOfColors = 0;
     int colorSelected = 0;
     boolean multiColored = false;
 
-    public BarColors() {
+    public ChartColors() {
         this.barColors = new ArrayList<>();
         addDefaultColors();
     }
@@ -82,7 +85,23 @@ public class BarColors {
         return multiColored;
     }
 
-    public void setMultiColored(boolean multiColored) {
+    public void setMultiColoredBars(boolean multiColored) {
         this.multiColored = multiColored;
+    }
+
+    public DeviceCmyk getGridLineColor() {
+        return gridLineColor;
+    }
+
+    public void setGridLineColor(DeviceCmyk gridLineColor) {
+        this.gridLineColor = gridLineColor;
+    }
+
+    public DeviceCmyk getScaleColor() {
+        return scaleColor;
+    }
+
+    public void setScaleColor(DeviceCmyk scaleColor) {
+        this.scaleColor = scaleColor;
     }
 }

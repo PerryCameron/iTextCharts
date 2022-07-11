@@ -7,7 +7,7 @@ import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.properties.TextAlignment;
-import scaling.BarColors;
+import scaling.ChartColors;
 import scaling.ChartScale;
 
 public class BarChart {
@@ -15,10 +15,7 @@ public class BarChart {
     private String[] xaxisData;
     private float[] yaxisData;
 
-    BarColors barColors = new BarColors();
-//    private DeviceCmyk barColor = new DeviceCmyk(.12f, .05f, 0, 0.02f);
-    private DeviceCmyk gridLineColor = new DeviceCmyk(.12f, .05f, 0, 0.02f);
-    private DeviceCmyk scaleColor = new DeviceCmyk(0, 0, 0, 100);
+    ChartColors chartColors = new ChartColors();
 
     // this is the height given for the chart, does not include legend or numbers (200 default)
     private float chartHeight = 200;
@@ -120,7 +117,7 @@ public class BarChart {
         Canvas canvas = new Canvas(pdfCanvas, rectangle);
         canvas.add(new Paragraph(String.valueOf(title))
                 .setTextAlignment(TextAlignment.CENTER)
-                .setFontColor(scaleColor)
+                .setFontColor(chartColors.getScaleColor())
                 .setFontSize(titleFontSize));
         canvas.close();
     }
@@ -155,7 +152,7 @@ public class BarChart {
      * Creates the X Axis Scale
      */
     private void createXAxisScale() {
-        pdfCanvas.setStrokeColor(scaleColor);
+        pdfCanvas.setStrokeColor(chartColors.getScaleColor());
         pdfCanvas.moveTo(xStart, yStart);
         pdfCanvas.lineTo(xStart + chartWidth, yStart);
         pdfCanvas.closePathStroke();
@@ -165,7 +162,7 @@ public class BarChart {
     private void createXAxisMiniTics() {
         float startPoint = barStartPoint + (barWidth * 0.5f);
         for(int i = 0; i < getNumberOfBars(); i++) {
-            pdfCanvas.setStrokeColor(scaleColor);
+            pdfCanvas.setStrokeColor(chartColors.getScaleColor());
             pdfCanvas.moveTo(startPoint, yStart);
             pdfCanvas.lineTo(startPoint, yStart - (chartHeight * 0.02f));
             pdfCanvas.closePathStroke();
@@ -187,7 +184,7 @@ public class BarChart {
             Canvas canvas = new Canvas(pdfCanvas, rectangle);
             canvas.add(new Paragraph(xaxisData[i])
                     .setTextAlignment(TextAlignment.CENTER)
-                    .setFontColor(scaleColor)
+                    .setFontColor(chartColors.getScaleColor())
                             .setFontSize(9)
                     .setRotationAngle(4.71));
             canvas.close();
@@ -202,7 +199,7 @@ public class BarChart {
     }
 
     private void createYAxisScale() {
-        pdfCanvas.setStrokeColor(scaleColor);
+        pdfCanvas.setStrokeColor(chartColors.getScaleColor());
         pdfCanvas.moveTo(calculateYAxisScaleStartPoint(), yStart);
         pdfCanvas.lineTo(calculateYAxisScaleStartPoint(), yStart + chartHeight);
         pdfCanvas.closePathStroke();
@@ -231,7 +228,7 @@ public class BarChart {
         for (int i = 0; i < numScale.getNumberOfTics() + 1; i++) {
             Rectangle rectangle = new Rectangle(36, ycordinate, 50, 24);
             Canvas canvas = new Canvas(pdfCanvas, rectangle);
-            canvas.add(new Paragraph(String.valueOf(increment)).setTextAlignment(TextAlignment.RIGHT).setFontColor(scaleColor));
+            canvas.add(new Paragraph(String.valueOf(increment)).setTextAlignment(TextAlignment.RIGHT).setFontColor(chartColors.getScaleColor()));
             canvas.close();
             increment += numScale.getTickSpacing();
             ycordinate += gridLineDistance;
@@ -241,7 +238,7 @@ public class BarChart {
     private void createBars(PdfCanvas pdfCanvas) {
         float x = barStartPoint;
         for (float height : yaxisData) {
-            DeviceCmyk barColor = barColors.nextColor();
+            DeviceCmyk barColor = chartColors.nextColor();
             pdfCanvas.setStrokeColor(barColor);
             Rectangle rectangle = new Rectangle(x, yStart, barWidth, calculateBarHeight(height));
             pdfCanvas.rectangle(rectangle).setFillColor(barColor).fillStroke();
@@ -263,7 +260,7 @@ public class BarChart {
     private void createGridLines() {
         float scaleHeight = yStart;
         for (int i = 0; i < numScale.getNumberOfTics(); i++) {
-            pdfCanvas.setStrokeColor(gridLineColor);
+            pdfCanvas.setStrokeColor(chartColors.getGridLineColor());
             scaleHeight = scaleHeight + gridLineDistance;
             pdfCanvas.moveTo(xStart, scaleHeight);
             pdfCanvas.lineTo(xStart + chartWidth, scaleHeight);
@@ -315,16 +312,8 @@ public class BarChart {
         this.chartWidth = chartWidth;
     }
 
-    public void setScaleColor(DeviceCmyk scaleColor) {
-        this.scaleColor = scaleColor;
-    }
-
-    public void setGridLineColor(DeviceCmyk gridLineColor) {
-        this.gridLineColor = gridLineColor;
-    }
-
-    public BarColors getBarColors() {
-        return barColors;
+    public ChartColors getChartColors() {
+        return chartColors;
     }
 
     /**
