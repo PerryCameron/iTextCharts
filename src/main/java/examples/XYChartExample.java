@@ -17,7 +17,6 @@ public class XYChartExample {
     public static final String TESTPATH = System.getProperty("user.home") + "/Documents/Test";
 
     public static DeviceCmyk barColor = new DeviceCmyk(.12f, .05f, 0, 0.02f);
-
     public static int tableHeight;
     public static int scaleWidth;
     public static int multiple;
@@ -51,6 +50,7 @@ public class XYChartExample {
         chart1.setXaxisData(xaxis);
         chart1.setYaxisData(yaxis);
         chart1.setVerticalHeight(550);
+        chart1.setTitle("New Members By Year");
         chart1.stroke();
 
         float[] xaxis1 = { 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
@@ -61,6 +61,8 @@ public class XYChartExample {
         chart2.setXaxisData(xaxis1);
         chart2.setYaxisData(yaxis1);
         chart2.setVerticalHeight(100);
+        chart2.setTitleFontSize(15);
+        chart2.setTitle("Types of fish bought in 2022");
         chart2.setBarColor(new DeviceCmyk(0,94,100,0));
         chart2.stroke();
 
