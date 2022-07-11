@@ -42,10 +42,27 @@ public class XYChartExample {
         PdfPage page = pdf.addNewPage();
 
 
+        int[] xaxis = { 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
+                2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022 };
+        int[] yaxis = { 21, 19, 18, 15, 13, 27, 17, 19, 20, 15, 24, 17, 21, 18,
+                23, 26, 15, 17, 28, 15, 7};
         PDFXYChart chart1 = new PDFXYChart(page);
         chart1.setChartHeight(200);
-//        chart1.setChartWidth(300);
+        chart1.setXaxisData(xaxis);
+        chart1.setYaxisData(yaxis);
+        chart1.setVerticalHeight(550);
         chart1.stroke();
+
+        int[] xaxis1 = { 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
+                2012, 2013, 2014, 2015};
+        int[] yaxis1 = { 101, 123, 78, 234, 102, 104, 193, 102, 50, 15, 234, 132, 142, 234};
+        PDFXYChart chart2 = new PDFXYChart(page);
+        chart2.setChartHeight(350);
+        chart2.setXaxisData(xaxis1);
+        chart2.setYaxisData(yaxis1);
+        chart2.setVerticalHeight(100);
+        chart2.setBarColor(new DeviceCmyk(0,94,100,0));
+        chart2.stroke();
 
         Document document = new Document(pdf);
         document.close();

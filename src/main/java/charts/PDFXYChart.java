@@ -10,14 +10,12 @@ import com.itextpdf.layout.properties.TextAlignment;
 
 public class PDFXYChart {
     // test data
-    private int[] xaxis = { 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
-            2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022 };
-    private  int[] yaxis = { 21, 19, 18, 15, 13, 27, 17, 19, 20, 15, 24, 17, 21, 18,
-            23, 26, 15, 17, 28, 15, 7};
-
+    private int[] xaxisData;
+    private  int[] yaxisData;
 
     private DeviceCmyk barColor = new DeviceCmyk(.12f, .05f, 0, 0.02f);
-    private final DeviceCmyk BLACK = new DeviceCmyk(0, 0, 0, 100);
+    private DeviceCmyk gridLineColor = new DeviceCmyk(.12f, .05f, 0, 0.02f);
+    private DeviceCmyk xAxisColor = new DeviceCmyk(0, 0, 0, 100);
 
     public void setChartHeight(float chartHeight) {
         this.chartHeight = chartHeight;
@@ -30,13 +28,13 @@ public class PDFXYChart {
     // bottom left x coordinate chart starts on
     private float xStart = 0;
     // bottom left y coordinate chart starts on
-    private float yStart = 500;
+    private float yStart = 0;
     // distance calculated for the size of the bars using given table height
     private float tableBarHeightSpacing;
     // distance between gridlines
     private float gridLineDistance;
     // size of the bars in relation to data, is a ratio
-    private float multiple;
+    private float multiple = 6;
     // determines if you want gridlines
     private boolean gridLinesVisable = true;
     // chart takes entire space between margins
@@ -67,13 +65,13 @@ public class PDFXYChart {
 
     public void stroke() {
         printValues();
-        this.multiple = 6;
         this.scale = getScale(getLargestStat());
         this.tableBarHeightSpacing = scale * multiple;
         this.gridLineDistance = chartHeight / multiple;
         this.yIncrement = scale / multiple;
         if(chartWidth == 0) setChartWidth();
         if(xStart == 0) getXStart();
+        if(yStart == 0) getYStart();
         calculateBarSize();
         calculateBarStartPoint();
         createXScale();
@@ -105,7 +103,7 @@ public class PDFXYChart {
         for(int i = 0; i < multiple + 1; i++) {
             Rectangle rectangle = new Rectangle(36,ycordinate , 50, 24);
             Canvas canvas = new Canvas(pdfCanvas, rectangle);
-            canvas.add(new Paragraph(String.valueOf(increment)).setTextAlignment(TextAlignment.RIGHT));
+            canvas.add(new Paragraph(String.valueOf(increment)).setTextAlignment(TextAlignment.RIGHT).setStrokeColor(xAxisColor));
             canvas.close();
             increment += yIncrement;
             ycordinate += gridLineDistance;
@@ -123,6 +121,10 @@ public class PDFXYChart {
         xStart = pdfPageWidth * pageMarginWidthSizeRatio;
     }
 
+    private void getYStart() {
+        yStart = pdfPageHeight - chartHeight - (pdfPageHeight * 0.15f);
+    }
+
     private void getPDFSize() {
         Rectangle thisPage = pdfCanvas.getDocument().getPage(1).getPageSize();
         this.pdfPageHeight = thisPage.getHeight();
@@ -137,7 +139,8 @@ public class PDFXYChart {
 
     private void createBars(PdfCanvas pdfCanvas) {
         float x = barStartPoint;
-        for(float height: yaxis) {
+        for(float height: yaxisData) {
+            pdfCanvas.setStrokeColor(barColor);
             Rectangle rectangle = new Rectangle(x, yStart, barWidth, calculateBarHeight(height));
             pdfCanvas.rectangle(rectangle).setFillColor(barColor).fillStroke();
             x = x + barWidth + spacerWidth;
@@ -149,7 +152,11 @@ public class PDFXYChart {
         return height * ((chartHeight * multiple) / tableBarHeightSpacing);
     }
 
+    /**
+     * Creates the line on the X axis
+     */
     private void createXScale() {
+        pdfCanvas.setStrokeColor(xAxisColor);
         pdfCanvas.moveTo(xStart, yStart -1);
         pdfCanvas.lineTo(xStart + chartWidth, yStart -1);
         pdfCanvas.closePathStroke();
@@ -158,7 +165,7 @@ public class PDFXYChart {
     private void createGridLines() {
         float scaleHeight = yStart;
         for(int i = 0; i < multiple; i++) {
-            pdfCanvas.setStrokeColor(barColor);
+            pdfCanvas.setStrokeColor(gridLineColor);
             scaleHeight = scaleHeight + gridLineDistance;
             pdfCanvas.moveTo(xStart, scaleHeight);
             pdfCanvas.lineTo(xStart + chartWidth, scaleHeight);
@@ -172,7 +179,7 @@ public class PDFXYChart {
     }
 
     private float getNumberOfBars() {
-        return xaxis.length;
+        return xaxisData.length;
     }
 
     private void calculateBarSize() {
@@ -190,7 +197,7 @@ public class PDFXYChart {
 
     private int getLargestStat() {
         int largestSize = 0;
-        for(int height: yaxis) {
+        for(int height: yaxisData) {
             if(height > largestSize)
                 largestSize = height;
         }
@@ -231,6 +238,10 @@ public class PDFXYChart {
         this.barColor = barColor;
     }
 
+    public void setxAxisColor(DeviceCmyk xAxisColor) {
+        this.xAxisColor = xAxisColor;
+    }
+
     /**
      *  Sets page margins that the chart will respect
      * @param pageMarginWidthSizeRatio
@@ -238,4 +249,18 @@ public class PDFXYChart {
     public void setPageMarginWidthSizeRatio(float pageMarginWidthSizeRatio) {
         this.pageMarginWidthSizeRatio = pageMarginWidthSizeRatio;
     }
+
+    public void setXaxisData(int[] xaxisData) {
+        this.xaxisData = xaxisData;
+    }
+
+    public void setYaxisData(int[] yaxisData) {
+        this.yaxisData = yaxisData;
+    }
+
+    public void setVerticalHeight(float yStart) {
+        this.yStart = yStart;
+    }
+
+
 }
