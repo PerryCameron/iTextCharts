@@ -50,20 +50,21 @@ public class XYChartExample {
         chart1.setXaxisData(xaxis);
         chart1.setYaxisData(yaxis);
         chart1.setVerticalHeight(550);
+        chart1.setTitleFontSize(20);
+        chart1.setGridLineColor(new DeviceCmyk(64,0,6,3));
         chart1.setTitle("New Members By Year");
         chart1.stroke();
 
-        float[] xaxis1 = { 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
-                2012, 2013, 2014, 2015};
-        float[] yaxis1 = { 101, 123, 78, 234, 102, 104, 193, 102, 50, 15, 234, 132, 142, 234};
+        float[] xaxis1 = { 2002, 2003, 2004, 2005, 2006 };
+        float[] yaxis1 = { 101, 123, 78, 234, 102 };
         PDFXYChart chart2 = new PDFXYChart(page);
         chart2.setChartHeight(300);
         chart2.setXaxisData(xaxis1);
         chart2.setYaxisData(yaxis1);
-        chart2.setVerticalHeight(100);
+        chart2.setVerticalHeight(120);
         chart2.setTitleFontSize(15);
-        chart2.setTitle("Types of fish bought in 2022");
-        chart2.setBarColor(new DeviceCmyk(0,94,100,0));
+        chart2.setTitle("Types Of Fish Bought In 2022");
+//        chart2.setBarColor(new DeviceCmyk(0,94,100,0));
         chart2.stroke();
 
         Document document = new Document(pdf);

@@ -7,6 +7,7 @@ import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.properties.TextAlignment;
+import scaling.BarColors;
 import scaling.ChartScale;
 
 public class PDFXYChart {
@@ -14,9 +15,10 @@ public class PDFXYChart {
     private float[] xaxisData;
     private float[] yaxisData;
 
-    private DeviceCmyk barColor = new DeviceCmyk(.12f, .05f, 0, 0.02f);
+    BarColors barColors;
+//    private DeviceCmyk barColor = new DeviceCmyk(.12f, .05f, 0, 0.02f);
     private DeviceCmyk gridLineColor = new DeviceCmyk(.12f, .05f, 0, 0.02f);
-    private DeviceCmyk xAxisColor = new DeviceCmyk(0, 0, 0, 100);
+    private DeviceCmyk scaleColor = new DeviceCmyk(0, 0, 0, 100);
 
     // this is the height given for the chart, does not include legend or numbers (200 default)
     private float chartHeight = 200;
@@ -30,6 +32,10 @@ public class PDFXYChart {
     private float gridLineDistance;
     // determines if you want gridlines
     private boolean gridLinesVisable = true;
+    // allows to choose bar colors (there is no limit)
+    private boolean multiColoredBars = false;
+    // outline bars with a different color
+    private boolean outLineBars = false;
     // ratio of the space between the bars to the size of the bars
     private float barSpaceRatio = 0.3f;
     // ratio of all the bars to the entire width of the chart
@@ -61,6 +67,7 @@ public class PDFXYChart {
 
     public void stroke() {
         getPDFSize();
+        this.barColors = new BarColors();
         this.numScale = getGridLineSpacing();
         printNumScaleValues();
         this.gridLineDistance = chartHeight / (float) numScale.getNumberOfTics();
@@ -69,14 +76,16 @@ public class PDFXYChart {
         if (yStart == 0) getYStart();
         calculateBarSize();
         calculateBarStartPoint();
-        createXScale();
+
         if (gridLinesVisable)
             createGridLines();
         createYAxisScale();
         setTitle();
-        setYscaleText();
+        setYscaleLabels();
+        createXAxisLabels();
         printValues();
         createBars(pdfCanvas);
+        createXAxisScale();
     }
 
     /**
@@ -94,6 +103,7 @@ public class PDFXYChart {
         System.out.println("Bar start point= " + barStartPoint);
         System.out.println(("pageMarginWidthSizeRatio: " + pageMarginWidthSizeRatio));
         System.out.println("BarWidth " + barWidth);
+
         System.out.println("SpacerWidth= " + spacerWidth);
     }
 
@@ -108,23 +118,13 @@ public class PDFXYChart {
         System.out.println("numberOfTics= " + numScale.getNumberOfTics());
     }
 
-    private void setYscaleText() {
-        int increment = 0;
-        float ycordinate = yStart - 12;
-        for (int i = 0; i < numScale.getNumberOfTics() + 1; i++) {
-            Rectangle rectangle = new Rectangle(36, ycordinate, 50, 24);
-            Canvas canvas = new Canvas(pdfCanvas, rectangle);
-            canvas.add(new Paragraph(String.valueOf(increment)).setTextAlignment(TextAlignment.RIGHT).setFontColor(xAxisColor));
-            canvas.close();
-            increment += numScale.getTickSpacing();
-            ycordinate += gridLineDistance;
-        }
-    }
-
     private void setTitle() {
-        Rectangle rectangle = new Rectangle(xStart, yStart + chartHeight, chartWidth, titleFontSize + 12);
+        Rectangle rectangle = new Rectangle(xStart, yStart + chartHeight, chartWidth, titleFontSize + 20);
         Canvas canvas = new Canvas(pdfCanvas, rectangle);
-        canvas.add(new Paragraph(String.valueOf(title)).setTextAlignment(TextAlignment.CENTER).setFontColor(xAxisColor).setFontSize(titleFontSize));
+        canvas.add(new Paragraph(String.valueOf(title))
+                .setTextAlignment(TextAlignment.CENTER)
+                .setFontColor(scaleColor)
+                .setFontSize(titleFontSize));
         canvas.close();
     }
 
@@ -154,35 +154,97 @@ public class PDFXYChart {
         barStartPoint = xStart + spacerWidth + (chartWidth * ((1 - barChartRatio) / 2));
     }
 
+    /**
+     * Creates the X Axis Scale
+     */
+    private void createXAxisScale() {
+        pdfCanvas.setStrokeColor(scaleColor);
+        pdfCanvas.moveTo(xStart, yStart);
+        pdfCanvas.lineTo(xStart + chartWidth, yStart);
+        pdfCanvas.closePathStroke();
+        createXAxisMiniTics();
+    }
+
+    private void createXAxisMiniTics() {
+        float startPoint = barStartPoint + (barWidth * 0.5f);
+        for(int i = 0; i < getNumberOfBars(); i++) {
+            pdfCanvas.setStrokeColor(scaleColor);
+            pdfCanvas.moveTo(startPoint, yStart);
+            pdfCanvas.lineTo(startPoint, yStart - (chartHeight * 0.02f));
+            pdfCanvas.closePathStroke();
+            System.out.print(i + " ");
+            startPoint = startPoint + barWidth + spacerWidth;
+        }
+        System.out.println();
+    }
+
+    private void createXAxisLabels() {
+            float rectangleWidth = 24;
+            float rectangleHeight = 80;
+            float xAxisStartPoint = (barStartPoint + (barWidth * 0.5f)) - (rectangleWidth * 0.5f) + 1;
+            float yAxisStartPoint = yStart - rectangleHeight -(chartHeight * 0.035f);
+        for(int i = 0; i < getNumberOfBars(); i++) {
+            Rectangle rectangle = new Rectangle(xAxisStartPoint, yAxisStartPoint, rectangleWidth, rectangleHeight);
+//            pdfCanvas.rectangle(rectangle);
+//            pdfCanvas.stroke();
+            Canvas canvas = new Canvas(pdfCanvas, rectangle);
+            canvas.add(new Paragraph(String.valueOf((int)xaxisData[i]))
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setFontColor(scaleColor)
+                            .setFontSize(9)
+                    .setRotationAngle(4.71));
+            canvas.close();
+            xAxisStartPoint = xAxisStartPoint + barWidth + spacerWidth;
+        }
+    }
+
+
     private double calculateYAxisScaleStartPoint() {
-        // starting point of the chart plus the amount you want to inse
+        // starting point of the chart plus the amount you want to inset
         return xStart + (chartWidth * ((1 - barChartRatio) / 2));
     }
 
     private void createYAxisScale() {
-        pdfCanvas.setStrokeColor(gridLineColor);
+        pdfCanvas.setStrokeColor(scaleColor);
         pdfCanvas.moveTo(calculateYAxisScaleStartPoint(), yStart);
         pdfCanvas.lineTo(calculateYAxisScaleStartPoint(), yStart + chartHeight);
         pdfCanvas.closePathStroke();
-        createMiniTics();
+        createYAxisMiniTics();
     }
 
-    private void createMiniTics() {
+    private void createYAxisMiniTics() {
+        float xAxisStartPoint = (float) calculateYAxisScaleStartPoint();
         float miniTicSize = (float) (gridLineDistance / 5);
         float yMiniTicStart = yStart;
-        for (int i = 0; i < numScale.getNumberOfTics() * 5; i++) {
-            pdfCanvas.moveTo(calculateYAxisScaleStartPoint(), yMiniTicStart);
-            pdfCanvas.lineTo(calculateYAxisScaleStartPoint() - chartWidth * 0.015, yMiniTicStart);
+        for (int i = 0; i < numScale.getNumberOfTics() * 5 + 1; i++) {
+            // starts cursor at bottom left corner of chart
+            pdfCanvas.moveTo(xAxisStartPoint, yMiniTicStart);
+            if(i % 5 ==0)
+                pdfCanvas.lineTo(xAxisStartPoint - chartWidth * 0.025, yMiniTicStart);
+            else
+                pdfCanvas.lineTo(xAxisStartPoint - chartWidth * 0.015, yMiniTicStart);
             pdfCanvas.closePathStroke();
             yMiniTicStart += miniTicSize;
-            System.out.print(i + " ");
         }
-        System.out.println();
+    }
+
+    private void setYscaleLabels() {
+        int increment = 0;
+        float ycordinate = yStart - 12;
+        for (int i = 0; i < numScale.getNumberOfTics() + 1; i++) {
+            Rectangle rectangle = new Rectangle(36, ycordinate, 50, 24);
+            Canvas canvas = new Canvas(pdfCanvas, rectangle);
+            canvas.add(new Paragraph(String.valueOf(increment)).setTextAlignment(TextAlignment.RIGHT).setFontColor(scaleColor));
+            canvas.close();
+            increment += numScale.getTickSpacing();
+            ycordinate += gridLineDistance;
+        }
     }
 
     private void createBars(PdfCanvas pdfCanvas) {
         float x = barStartPoint;
         for (float height : yaxisData) {
+            DeviceCmyk barColor = barColors.nextColor();
             pdfCanvas.setStrokeColor(barColor);
             Rectangle rectangle = new Rectangle(x, yStart, barWidth, calculateBarHeight(height));
             pdfCanvas.rectangle(rectangle).setFillColor(barColor).fillStroke();
@@ -191,20 +253,14 @@ public class PDFXYChart {
         System.out.println("x= " + x);
     }
 
+//    private DeviceCmyk getBarStrokeColor() {
+//
+//    }
+
     private float calculateBarHeight(float height) {
         // will determine the value of 1 part
         float barPart = (float) (chartHeight / numScale.getNiceMax());
-        return (float) (height * barPart);  // not quite right, i fucked this up
-    }
-
-    /**
-     * Creates the line on the X axis
-     */
-    private void createXScale() {
-        pdfCanvas.setStrokeColor(xAxisColor);
-        pdfCanvas.moveTo(xStart, yStart - 1);
-        pdfCanvas.lineTo(xStart + chartWidth, yStart - 1);
-        pdfCanvas.closePathStroke();
+        return (float) (height * barPart);
     }
 
     private void createGridLines() {
@@ -262,17 +318,12 @@ public class PDFXYChart {
         this.chartWidth = chartWidth;
     }
 
-    /**
-     * Sets the color of the bars
-     *
-     * @param barColor
-     */
-    public void setBarColor(DeviceCmyk barColor) {
-        this.barColor = barColor;
+    public void setScaleColor(DeviceCmyk scaleColor) {
+        this.scaleColor = scaleColor;
     }
 
-    public void setxAxisColor(DeviceCmyk xAxisColor) {
-        this.xAxisColor = xAxisColor;
+    public void setGridLineColor(DeviceCmyk gridLineColor) {
+        this.gridLineColor = gridLineColor;
     }
 
     /**
