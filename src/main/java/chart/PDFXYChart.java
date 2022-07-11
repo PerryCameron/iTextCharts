@@ -1,4 +1,4 @@
-package charts;
+package chart;
 
 import com.itextpdf.kernel.colors.DeviceCmyk;
 import com.itextpdf.kernel.geom.Rectangle;
@@ -12,10 +12,10 @@ import scaling.ChartScale;
 
 public class PDFXYChart {
     // test data
-    private float[] xaxisData;
+    private String[] xaxisData;
     private float[] yaxisData;
 
-    BarColors barColors;
+    BarColors barColors = new BarColors();
 //    private DeviceCmyk barColor = new DeviceCmyk(.12f, .05f, 0, 0.02f);
     private DeviceCmyk gridLineColor = new DeviceCmyk(.12f, .05f, 0, 0.02f);
     private DeviceCmyk scaleColor = new DeviceCmyk(0, 0, 0, 100);
@@ -67,7 +67,6 @@ public class PDFXYChart {
 
     public void stroke() {
         getPDFSize();
-        this.barColors = new BarColors();
         this.numScale = getGridLineSpacing();
         printNumScaleValues();
         this.gridLineDistance = chartHeight / (float) numScale.getNumberOfTics();
@@ -76,7 +75,6 @@ public class PDFXYChart {
         if (yStart == 0) getYStart();
         calculateBarSize();
         calculateBarStartPoint();
-
         if (gridLinesVisable)
             createGridLines();
         createYAxisScale();
@@ -103,7 +101,6 @@ public class PDFXYChart {
         System.out.println("Bar start point= " + barStartPoint);
         System.out.println(("pageMarginWidthSizeRatio: " + pageMarginWidthSizeRatio));
         System.out.println("BarWidth " + barWidth);
-
         System.out.println("SpacerWidth= " + spacerWidth);
     }
 
@@ -188,7 +185,7 @@ public class PDFXYChart {
 //            pdfCanvas.rectangle(rectangle);
 //            pdfCanvas.stroke();
             Canvas canvas = new Canvas(pdfCanvas, rectangle);
-            canvas.add(new Paragraph(String.valueOf((int)xaxisData[i]))
+            canvas.add(new Paragraph(xaxisData[i])
                     .setTextAlignment(TextAlignment.CENTER)
                     .setFontColor(scaleColor)
                             .setFontSize(9)
@@ -326,6 +323,10 @@ public class PDFXYChart {
         this.gridLineColor = gridLineColor;
     }
 
+    public BarColors getBarColors() {
+        return barColors;
+    }
+
     /**
      * Sets page margins that the chart will respect
      *
@@ -335,7 +336,7 @@ public class PDFXYChart {
         this.pageMarginWidthSizeRatio = pageMarginWidthSizeRatio;
     }
 
-    public void setXaxisData(float[] xaxisData) {
+    public void setXaxisData(String[] xaxisData) {
         this.xaxisData = xaxisData;
     }
 

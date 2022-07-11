@@ -9,6 +9,7 @@ public class BarColors {
     ArrayList<DeviceCmyk> barColors;
     int numberOfColors = 0;
     int colorSelected = 0;
+    boolean multiColored = false;
 
     public BarColors() {
         this.barColors = new ArrayList<>();
@@ -16,7 +17,7 @@ public class BarColors {
     }
 
     public void addDefaultColors() {
-        barColors.add(new DeviceCmyk(.12f, .05f, 0, 0.02f));
+        barColors.add(new DeviceCmyk(0.79f, 0.33f, 0, 0.11f));
         barColors.add(new DeviceCmyk(0,0.06f,0.09f,0.73f));
         barColors.add(new DeviceCmyk(0,0.55f,0.71f,0.11f));
         barColors.add(new DeviceCmyk(0.02f,0,0.53f,0.04f));
@@ -25,8 +26,6 @@ public class BarColors {
         barColors.add(new DeviceCmyk(0.28f,0.11f,0,0.26f));
         barColors.add(new DeviceCmyk(0.22f,0.02f,0,0.22f));
         barColors.add(new DeviceCmyk(0.10f,0.11f,0,0.17f));
-
-
         setColorChoice();
     }
 
@@ -35,11 +34,17 @@ public class BarColors {
      * @return
      */
     public DeviceCmyk nextColor() {
-        DeviceCmyk color = barColors.get(colorSelected);
-        if(colorSelected == barColors.size() -1)
-            colorSelected = 0;
-        else
-            colorSelected++;
+        DeviceCmyk color;
+        if(multiColored) {
+            color = barColors.get(colorSelected);
+            if (colorSelected == barColors.size() - 1)
+                colorSelected = 0;
+            else
+                colorSelected++;
+            return color;
+        } else
+            color = barColors.get(0);
+        // if we are not doing multi colors then first color in array is the bar color
         return color;
     }
 
@@ -53,6 +58,17 @@ public class BarColors {
         setColorChoice();
     }
 
+    /**
+     * This is for use if you are only using one color for your bar, It will remove all colors from the array,
+     * set multiColored to false and put the color you chose into the array
+     * @param color
+     */
+    public void setBarColor(DeviceCmyk color) {
+        flushDefaultColors();
+        barColors.add(color);
+        multiColored = false;
+    }
+
     public void addColor(DeviceCmyk color) {
         barColors.add(color);
         setColorChoice();
@@ -60,5 +76,13 @@ public class BarColors {
 
     public ArrayList<DeviceCmyk> getBarColors() {
         return barColors;
+    }
+
+    public boolean isMultiColored() {
+        return multiColored;
+    }
+
+    public void setMultiColored(boolean multiColored) {
+        this.multiColored = multiColored;
     }
 }

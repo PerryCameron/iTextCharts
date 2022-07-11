@@ -1,7 +1,7 @@
 package examples;
 
 
-import charts.PDFXYChart;
+import chart.PDFXYChart;
 import com.itextpdf.kernel.colors.DeviceCmyk;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfPage;
@@ -41,11 +41,12 @@ public class XYChartExample {
         PdfPage page = pdf.addNewPage();
 
 
-        float[] xaxis = { 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
-                2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022 };
+        String[] xaxis = { "2002", "2003", "2004", "2005", "2006", "2007","2008", "2009", "2010", "2011",
+                "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022" };
         float[] yaxis = { 21, 19, 18, 15, 13, 27, 17, 19, 20, 15, 24, 17, 21, 18,
                 23, 26, 15, 17, 28, 15, 7};
         PDFXYChart chart1 = new PDFXYChart(page);
+        chart1.getBarColors().setBarColor(new DeviceCmyk(.12f, .05f, 0, 0.02f));
         chart1.setChartHeight(200);
         chart1.setXaxisData(xaxis);
         chart1.setYaxisData(yaxis);
@@ -55,9 +56,10 @@ public class XYChartExample {
         chart1.setTitle("New Members By Year");
         chart1.stroke();
 
-        float[] xaxis1 = { 2002, 2003, 2004, 2005, 2006 };
+        String[] xaxis1 = { "Guppy", "Goldfish", "Oscar", "Swordfish", "Shark" };
         float[] yaxis1 = { 101, 123, 78, 234, 102 };
         PDFXYChart chart2 = new PDFXYChart(page);
+        chart2.getBarColors().setMultiColored(true);
         chart2.setChartHeight(300);
         chart2.setXaxisData(xaxis1);
         chart2.setYaxisData(yaxis1);
