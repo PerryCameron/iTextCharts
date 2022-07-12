@@ -358,4 +358,8 @@ public class BarChart {
     public ChartScale getChartScale() {
         return chartScale;
     }
+
+    public void setGridLinesVisable(boolean gridLinesVisable) {
+        this.gridLinesVisable = gridLinesVisable;
+    }
 }

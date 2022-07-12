@@ -73,6 +73,7 @@ public class BarChartExample {
         chart3.setStartPoint(200,350);
         chart3.setTitleFontSize(15);
         chart3.setTitle("Magazines Read over lifetime");
+        chart3.setGridLinesVisable(false);
         chart3.stroke();
 
         Document document = new Document(pdf);
