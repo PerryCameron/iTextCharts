@@ -19,7 +19,6 @@ public class BarChart {
     private ChartColors chartColors = new ChartColors();
     // object to handle scaling
     private ChartScale chartScale = new ChartScale();
-
     // this is the height given for the chart, does not include legend or numbers (200 default)
     private float chartHeight = 200;
     // entire width of the chart
@@ -36,6 +35,8 @@ public class BarChart {
     private boolean multiColoredBars = false;
     // outline bars with a different color
     private boolean outLineBars = false;
+    // chart will focus on datapoints instead of starting xAxis at 0
+    private boolean autoScale = true;
     // ratio of the space between the bars to the size of the bars
     private float barSpaceRatio = 0.3f;
     // ratio of all the bars to the entire width of the chart
@@ -66,22 +67,34 @@ public class BarChart {
     public void stroke() {
         getPDFSize();
         getGridLineSpacing();
-//        printNumScaleValues();
-        this.gridLineDistance = chartHeight / (float) chartScale.getNumberOfTics();
-        if (chartWidth == 0) setChartWidth();
-        if (xStart == 0) getXStart();
-        if (yStart == 0) getYStart();
+        printNumScaleValues();
+        setVariables();
+        getGridLineDistance();
         calculateBarSize();
         calculateBarStartPoint();
         if (gridLinesVisable)
             createGridLines();
-        createYAxisScale();
+        createYScale();
         setTitle();
         setYscaleLabels();
         setXScaleLabels();
-//        printValues();
+        printValues();
         createBars(pdfCanvas);
         createXAxisScale();
+        System.out.println("number of ticks" + chartScale.getNumberOfTics());
+    }
+
+    private void setVariables() {
+        if (chartWidth == 0) setChartWidth();
+        if (xStart == 0) getXStart();
+        if (yStart == 0) getYStart();
+    }
+
+    private void getGridLineDistance() {
+        float numTics = (float) chartScale.getNumberOfTics();
+        if(autoScale)
+            numTics = (float) chartScale.getNiceTics();
+        gridLineDistance = chartHeight / numTics ;
     }
 
     /**
@@ -111,6 +124,7 @@ public class BarChart {
         System.out.println("niceMax= " + chartScale.getNiceMax());
         System.out.println("niceMin= " + chartScale.getNiceMin());
         System.out.println("numberOfTics= " + chartScale.getNumberOfTics());
+        System.out.println("numberOfNicTics= " + chartScale.getNiceTics());
     }
 
     private void setTitle() {
@@ -167,7 +181,6 @@ public class BarChart {
             pdfCanvas.moveTo(startPoint, yStart);
             pdfCanvas.lineTo(startPoint, yStart - (chartHeight * 0.02f));
             pdfCanvas.closePathStroke();
-//            System.out.print(i + " ");
             startPoint = startPoint + barWidth + spacerWidth;
         }
         System.out.println();
@@ -193,25 +206,24 @@ public class BarChart {
         }
     }
 
-
     private double calculateYAxisScaleStartPoint() {
         // starting point of the chart plus the amount you want to inset
         return xStart + (chartWidth * ((1 - barChartRatio) / 2));
     }
 
-    private void createYAxisScale() {
+    private void createYScale() {
         pdfCanvas.setStrokeColor(chartColors.getScaleColor());
         pdfCanvas.moveTo(calculateYAxisScaleStartPoint(), yStart);
         pdfCanvas.lineTo(calculateYAxisScaleStartPoint(), yStart + chartHeight);
         pdfCanvas.closePathStroke();
-        createYAxisMiniTics();
+        createYScaleMiniTics();
     }
 
-    private void createYAxisMiniTics() {
+    private void createYScaleMiniTics() {
         float xAxisStartPoint = (float) calculateYAxisScaleStartPoint();
         float miniTicSize = (float) (gridLineDistance / 5);
         float yMiniTicStart = yStart;
-        for (int i = 0; i < chartScale.getNumberOfTics() * 5 + 1; i++) {
+        for (int i = 0; i < getNumberOfTics() * 5 + 1; i++) {
             // starts cursor at bottom left corner of chart
             pdfCanvas.moveTo(xAxisStartPoint, yMiniTicStart);
             if(i % 5 ==0)
@@ -225,8 +237,11 @@ public class BarChart {
 
     private void setYscaleLabels() {
         int increment = 0;
+        float numTics = getNumberOfTics();
+        if(autoScale)
+            increment = (int) chartScale.getNiceMin();
         float ycordinate = yStart - 12;
-        for (int i = 0; i < chartScale.getNumberOfTics() + 1; i++) {
+        for (int i = 0; i < numTics + 1; i++) {
             Rectangle rectangle = new Rectangle(xStart -54, ycordinate, 50, 24);
             Canvas canvas = new Canvas(pdfCanvas, rectangle);
             canvas.add(new Paragraph(String.valueOf(increment))
@@ -236,6 +251,13 @@ public class BarChart {
             increment += chartScale.getTickSpacing();
             ycordinate += gridLineDistance;
         }
+    }
+
+    private float getNumberOfTics() {
+        if(autoScale) {
+            return (float) chartScale.getNiceTics();
+        }
+        return (float) chartScale.getNumberOfTics();
     }
 
     private void createBars(PdfCanvas pdfCanvas) {
@@ -250,14 +272,21 @@ public class BarChart {
     }
 
     private float calculateBarHeight(float height) {
-        // will determine the value of 1 part
-        float barPart = (float) (chartHeight / chartScale.getNiceMax());
-        return (float) (height * barPart);
+        float barHeight = 0;
+        float totalBarSize = (float) chartScale.getNiceMax();
+        if(autoScale) {
+            totalBarSize = (float) chartScale.getNiceMinMaxDiff();
+            height -= chartScale.getNiceMin();
+        }
+        float barPart = (float) (chartHeight / totalBarSize);
+        System.out.println("barPart= " + barPart);
+        barHeight = height * barPart;
+        return barHeight;
     }
 
     private void createGridLines() {
         float scaleHeight = yStart;
-        for (int i = 0; i < chartScale.getNumberOfTics(); i++) {
+        for (int i = 0; i < getNumberOfTics(); i++) {
             pdfCanvas.setStrokeColor(chartColors.getGridLineColor());
             scaleHeight = scaleHeight + gridLineDistance;
             pdfCanvas.moveTo(xStart, scaleHeight);
@@ -280,15 +309,13 @@ public class BarChart {
     }
 
     private float[] getMinMaxStats() {
-        float maxSize = yaxisData[0];
-        float minSize = yaxisData[0];
+        float maxSize = yaxisData[0], minSize = yaxisData[0];
         float result[] = new float[2];
         for (float height : yaxisData) {
             if (height > maxSize)
                 maxSize = height;
             if (height < minSize)
                 minSize = height;
-
         }
         result[0] = minSize;
         result[1] = maxSize;
@@ -298,15 +325,6 @@ public class BarChart {
     private void getGridLineSpacing() {
         float minmax[] = getMinMaxStats();
         chartScale.setMinMaxPoints(minmax[0], minmax[1]);
-    }
-
-    /**
-     * Sets the width of the table
-     *
-     * @param chartWidth
-     */
-    public void setChartWidth(float chartWidth) {
-        this.chartWidth = chartWidth;
     }
 
     public ChartColors getChartColors() {
@@ -330,36 +348,86 @@ public class BarChart {
         this.yaxisData = yaxisData;
     }
 
+    /**
+     * Sets the (x,y) coordinate for the start location of the chart. This is the bottom left corner
+     * @param x
+     * @param y
+     */
     public void setStartPoint(float x, float y) {
         this.xStart = x;
         this.yStart = y;
     }
 
-    public void setVerticalStart(float yStart) {
-        this.yStart = yStart;
+    /**
+     * Sets the y coordinate for the start location of the chart. This is the bottom left corner
+     * @param y
+     */
+    public void setVerticalStart(float y) {
+        this.yStart = y;
     }
 
-    public void setHorizontalStart(float xStart) {
-        this.xStart = xStart;
+    /**
+     * Sets the x coordinate for the start location of the chart. This is the bottom left corner
+     * @param x
+     */
+    public void setHorizontalStart(float x) {
+        this.xStart = x;
     }
 
+    /**
+     * Sets the width of the chart
+     * @param chartWidth
+     */
+    public void setChartWidth(float chartWidth) {
+        this.chartWidth = chartWidth;
+    }
+    /**
+     * Sets the height of the chart
+     * @param chartHeight
+     */
     public void setChartHeight(float chartHeight) {
         this.chartHeight = chartHeight;
     }
 
+    /**
+     * Sets the size of the chart
+     * @param width
+     * @param height
+     */
+    public void setChartSize(float width, float height) {
+        this.chartWidth = width;
+        this.chartHeight = height;
+    }
+
+    /**
+     * Sets title of chart
+     * @param title
+     */
     public void setTitle(String title) {
         this.title = title;
     }
 
+    /**
+     * Sets font size for chart title
+     * @param titleFontSize
+     */
     public void setTitleFontSize(float titleFontSize) {
         this.titleFontSize = titleFontSize;
     }
 
-    public ChartScale getChartScale() {
-        return chartScale;
-    }
-
+    /**
+     * When true grid lines are shown in chart
+     * @param gridLinesVisable
+     */
     public void setGridLinesVisable(boolean gridLinesVisable) {
         this.gridLinesVisable = gridLinesVisable;
+    }
+
+    /**
+     * Scales chart to make data easier to read
+     * @param autoScale
+     */
+    public void setAutoScale(boolean autoScale) {
+        this.autoScale = autoScale;
     }
 }

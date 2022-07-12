@@ -22,7 +22,7 @@ public class BarChartExample {
         final String TESTPATH = System.getProperty("user.home") + "/Documents/ChartExamples";
         // Check to make sure directory exists and if not create it
         checkPath(TESTPATH);
-        String dest = TESTPATH+ "/BarChart.pdf";
+        String dest = TESTPATH+ "/BarChart1.pdf";
         try {
             writer = new PdfWriter(dest);
         } catch (FileNotFoundException e) {
@@ -42,6 +42,8 @@ public class BarChartExample {
         chart1.setChartHeight(200);
         chart1.setXaxisData(xaxis);
         chart1.setYaxisData(yaxis);
+        chart1.setAutoScale(false);
+//        chart1.setAutoScale(false);
         chart1.setVerticalStart(550);
         chart1.setTitleFontSize(20);
         chart1.getChartColors().setGridLineColor(new DeviceCmyk(64,0,6,3));
@@ -55,6 +57,7 @@ public class BarChartExample {
         chart2.setChartHeight(300);
         chart2.setXaxisData(xaxis1);
         chart2.setYaxisData(yaxis1);
+        chart2.setAutoScale(true);
         chart2.setVerticalStart(120);
         chart2.setTitleFontSize(15);
         chart2.setTitle("Types Of Fish Bought In 2022");
@@ -62,18 +65,16 @@ public class BarChartExample {
 
         page = pdf.addNewPage();
         String[] xaxis2 = { "Time", "People", "Newsweek" };
-        float[] yaxis2 = { 800, 852, 900};
+        float[] yaxis2 = { 803, 852, 900};
         BarChart chart3 = new BarChart(page);
-        chart3.getChartScale().setMaxTicks(2);
         chart3.getChartColors().setMultiColoredBars(true);
-        chart3.setChartHeight(400);
-        chart3.setChartWidth(200);
+        chart3.setChartSize(200,400);
         chart3.setXaxisData(xaxis2);
         chart3.setYaxisData(yaxis2);
         chart3.setStartPoint(200,350);
         chart3.setTitleFontSize(15);
         chart3.setTitle("Magazines Read over lifetime");
-        chart3.setGridLinesVisable(false);
+//        chart3.setGridLinesVisable(false);
         chart3.stroke();
 
         Document document = new Document(pdf);
