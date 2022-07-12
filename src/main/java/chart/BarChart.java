@@ -72,8 +72,7 @@ public class BarChart {
         getGridLineDistance();
         calculateBarSize();
         calculateBarStartPoint();
-        if (gridLinesVisable)
-            createGridLines();
+        createGridLines();
         createYScale();
         setTitle();
         setYscaleLabels();
@@ -81,7 +80,6 @@ public class BarChart {
         printValues();
         createBars(pdfCanvas);
         createXAxisScale();
-        System.out.println("number of ticks" + chartScale.getNumberOfTics());
     }
 
     private void setVariables() {
@@ -260,17 +258,34 @@ public class BarChart {
         return (float) chartScale.getNumberOfTics();
     }
 
+    /**
+     * Draws bars on the chart
+     * @param pdfCanvas
+     */
     private void createBars(PdfCanvas pdfCanvas) {
         float x = barStartPoint;
         for (float height : yaxisData) {
-            DeviceCmyk barColor = chartColors.nextColor();
-            pdfCanvas.setStrokeColor(barColor);
+            pdfCanvas.setStrokeColor(getStrokeColor());
             Rectangle rectangle = new Rectangle(x, yStart, barWidth, calculateBarHeight(height));
-            pdfCanvas.rectangle(rectangle).setFillColor(barColor).fillStroke();
+            pdfCanvas.rectangle(rectangle).setFillColor(chartColors.nextColor()).fillStroke();
             x = x + barWidth + spacerWidth;
         }
     }
 
+    /**
+     * Changes outline of bar color if outLineBars is set to true
+     * @return
+     */
+    private DeviceCmyk getStrokeColor() {
+        if(outLineBars) return chartColors.getScaleColor();
+        return chartColors.nextColor();
+    }
+
+    /**
+     * Calculates the height of a given bar
+     * @param height
+     * @return
+     */
     private float calculateBarHeight(float height) {
         float barHeight = 0;
         float totalBarSize = (float) chartScale.getNiceMax();
@@ -284,21 +299,33 @@ public class BarChart {
         return barHeight;
     }
 
+    /**
+     * Draws gridlines if enabled
+     */
     private void createGridLines() {
-        float scaleHeight = yStart;
-        for (int i = 0; i < getNumberOfTics(); i++) {
-            pdfCanvas.setStrokeColor(chartColors.getGridLineColor());
-            scaleHeight = scaleHeight + gridLineDistance;
-            pdfCanvas.moveTo(xStart, scaleHeight);
-            pdfCanvas.lineTo(xStart + chartWidth, scaleHeight);
-            pdfCanvas.closePathStroke();
+        if (gridLinesVisable) {
+            float scaleHeight = yStart;
+            for (int i = 0; i < getNumberOfTics(); i++) {
+                pdfCanvas.setStrokeColor(chartColors.getGridLineColor());
+                scaleHeight = scaleHeight + gridLineDistance;
+                pdfCanvas.moveTo(xStart, scaleHeight);
+                pdfCanvas.lineTo(xStart + chartWidth, scaleHeight);
+                pdfCanvas.closePathStroke();
+            }
         }
     }
 
+    /**
+     * returns number of elements in data array used on x-axis
+     * @return
+     */
     private float getNumberOfBars() {
         return xaxisData.length;
     }
 
+    /**
+     * Calculates the width of a bar, and the width of the space between bars
+     */
     private void calculateBarSize() {
         // divide 90% of chartWidth by the number of bars
         float barsAndSpacers = (chartWidth * barChartRatio) / (getNumberOfBars());
@@ -308,6 +335,10 @@ public class BarChart {
         this.barWidth = barsAndSpacers * (1 - barSpaceRatio);
     }
 
+    /**
+     * Returns the smallest and largest values from data array
+     * @return
+     */
     private float[] getMinMaxStats() {
         float maxSize = yaxisData[0], minSize = yaxisData[0];
         float result[] = new float[2];
@@ -332,8 +363,7 @@ public class BarChart {
     }
 
     /**
-     * Sets page margins that the chart will respect
-     *
+     * Sets page margins that the chart will respect if chart width is not set
      * @param pageMarginWidthSizeRatio
      */
     public void setPageMarginWidthSizeRatio(float pageMarginWidthSizeRatio) {
@@ -429,5 +459,13 @@ public class BarChart {
      */
     public void setAutoScale(boolean autoScale) {
         this.autoScale = autoScale;
+    }
+
+    /**
+     * Outlines the bars if outLineBars is set to true, the color will be the same as scale color
+     * @param outLineBars
+     */
+    public void setOutLineBars(boolean outLineBars) {
+        this.outLineBars = outLineBars;
     }
 }

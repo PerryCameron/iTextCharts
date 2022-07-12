@@ -43,7 +43,7 @@ public class BarChartExample {
         chart1.setXaxisData(xaxis);
         chart1.setYaxisData(yaxis);
         chart1.setAutoScale(false);
-//        chart1.setAutoScale(false);
+        chart1.setOutLineBars(true);
         chart1.setVerticalStart(550);
         chart1.setTitleFontSize(20);
         chart1.getChartColors().setGridLineColor(new DeviceCmyk(64,0,6,3));
@@ -57,6 +57,7 @@ public class BarChartExample {
         chart2.setChartHeight(300);
         chart2.setXaxisData(xaxis1);
         chart2.setYaxisData(yaxis1);
+        chart2.setOutLineBars(true);
         chart2.setAutoScale(true);
         chart2.setVerticalStart(120);
         chart2.setTitleFontSize(15);
