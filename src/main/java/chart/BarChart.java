@@ -267,7 +267,7 @@ public class BarChart {
         for (float height : yaxisData) {
             pdfCanvas.setStrokeColor(getStrokeColor());
             Rectangle rectangle = new Rectangle(x, yStart, barWidth, calculateBarHeight(height));
-            pdfCanvas.rectangle(rectangle).setFillColor(chartColors.nextColor()).fillStroke();
+            pdfCanvas.rectangle(rectangle).setFillColor(chartColors.nextBarColor()).fillStroke();
             x = x + barWidth + spacerWidth;
         }
     }
@@ -278,7 +278,7 @@ public class BarChart {
      */
     private DeviceCmyk getStrokeColor() {
         if(outLineBars) return chartColors.getScaleColor();
-        return chartColors.nextColor();
+        return chartColors.currentBarColor();
     }
 
     /**
@@ -353,11 +353,18 @@ public class BarChart {
         return result;
     }
 
+    /**
+     *
+     */
     private void getGridLineSpacing() {
         float minmax[] = getMinMaxStats();
         chartScale.setMinMaxPoints(minmax[0], minmax[1]);
     }
 
+    /**
+     * Returns chart color object which has methods to manipulate the color scheme
+     * @return
+     */
     public ChartColors getChartColors() {
         return chartColors;
     }
@@ -370,10 +377,18 @@ public class BarChart {
         this.pageMarginWidthSizeRatio = pageMarginWidthSizeRatio;
     }
 
+    /**
+     * Chart Data
+     * @param xaxisData
+     */
     public void setXaxisData(String[] xaxisData) {
         this.xaxisData = xaxisData;
     }
 
+    /**
+     * Data used to label the chart data
+     * @param yaxisData
+     */
     public void setYaxisData(float[] yaxisData) {
         this.yaxisData = yaxisData;
     }

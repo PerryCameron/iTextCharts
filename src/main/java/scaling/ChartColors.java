@@ -36,7 +36,7 @@ public class ChartColors {
      *  picks next color on pallet, when it gets to the end it rotates back to the first color
      * @return
      */
-    public DeviceCmyk nextColor() {
+    public DeviceCmyk nextBarColor() {
         DeviceCmyk color;
         if(multiColored) {
             color = barColors.get(colorSelected);
@@ -49,6 +49,10 @@ public class ChartColors {
             color = barColors.get(0);
         // if we are not doing multi colors then first color in array is the bar color
         return color;
+    }
+
+    public DeviceCmyk currentBarColor() {
+            return barColors.get(colorSelected);
     }
 
     public void setColorChoice() {
