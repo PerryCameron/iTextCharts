@@ -33,6 +33,8 @@ public class ChartScale {
     private void calculate() {
         this.range = niceNum(maxPoint - minPoint, false);
         this.tickSpacing = niceNum(range / (maxTicks - 1), true);
+        System.out.println("range: " + range);
+        System.out.println("tickSpacing: " + tickSpacing);
         this.niceMin =
                 Math.floor(minPoint / tickSpacing) * tickSpacing;
         this.niceMax =
@@ -53,7 +55,9 @@ public class ChartScale {
         double niceFraction; /** nice, rounded fraction */
 
         exponent = Math.floor(Math.log10(range));
+        System.out.println("exponent: (" +exponent + ") = Math.floor(Math.log10(" + range + "));");
         fraction = range / Math.pow(10, exponent);
+        System.out.println("fraction: (" + fraction + ") = range / Math.pow(10, exponent);");
 
         if (round) {
             if (fraction < 1.5)
@@ -74,7 +78,7 @@ public class ChartScale {
             else
                 niceFraction = 10;
         }
-
+        System.out.println("niceFraction= " + niceFraction + " Was rounded= " + round);
         return niceFraction * Math.pow(10, exponent);
     }
 
@@ -87,6 +91,7 @@ public class ChartScale {
     public void setMinMaxPoints(double minPoint, double maxPoint) {
         this.minPoint = minPoint;
         this.maxPoint = maxPoint;
+        System.out.println("maxPoint: " + maxPoint + " minPoint: " + minPoint);
         calculate();
     }
 
@@ -98,6 +103,7 @@ public class ChartScale {
     public void setMaxTicks(double maxTicks) {
         this.maxTicks = maxTicks;
         calculate();
+        System.out.println("--------------> number of tics= " + getNumberOfTics());
     }
 
     public double getMinPoint() {
