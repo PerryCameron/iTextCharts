@@ -6,7 +6,7 @@ While this does work, I felt that it would be better to have a native library so
 and the PDF documents could be  small. I am starting with an XYChart, but plan on adding stacked bar chart, Pie Chart
 and many more.
 
-## XY Chart
+## BAR Chart
 <p>
     <img src="https://github.com/PerryCameron/iTextCharts/blob/main/src/main/resources/screenshots/BarChartScreenShot.png"  />
 </p>
