@@ -1,7 +1,7 @@
 package examples;
 
 
-import chart.BarChart;
+import chart.BarChartImpl;
 import com.itextpdf.kernel.colors.DeviceCmyk;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfPage;
@@ -37,7 +37,7 @@ public class BarChartExample {
                 "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022" };
         float[] yaxis = { 21, 19, 18, 15, 13, 27, 17, 19, 20, 15, 24, 17, 21, 18,
                 23, 26, 15, 17, 28, 15, 7};
-        BarChart chart1 = new BarChart(page);
+        BarChartImpl chart1 = new BarChartImpl(page);
         chart1.getChartColors().setBarColor(new DeviceCmyk(.12f, .05f, 0, 0.02f));
         chart1.getChartColors().setBackgroundColor(new DeviceCmyk(0, .02f, 0.15f, 0.01f));
         chart1.setChartHeight(200);
@@ -54,7 +54,7 @@ public class BarChartExample {
 
         String[] xaxis1 = { "Guppy", "Goldfish", "Oscar", "Swordfish", "Shark" };
         float[] yaxis1 = { 101, 123, 78, 234, 102 };
-        BarChart chart2 = new BarChart(page);
+        BarChartImpl chart2 = new BarChartImpl(page);
         chart2.getChartColors().setMultiColoredBars(true);
         chart2.setChartSize(200,200);
         chart2.setxSeriesData(xaxis1);
@@ -69,7 +69,7 @@ public class BarChartExample {
 //        page = pdf.addNewPage();
         String[] xaxis2 = { "Time", "People", "Newsweek" };
         float[] yaxis2 = { 803, 852, 892};
-        BarChart chart3 = new BarChart(page);
+        BarChartImpl chart3 = new BarChartImpl(page);
         chart3.getChartColors().setMultiColoredBars(true);
 //        chart3.getChartColors().setBackgroundColor(new DeviceCmyk(.12f, .05f, 0, 0.02f));
         chart3.setChartSize(200,350);
