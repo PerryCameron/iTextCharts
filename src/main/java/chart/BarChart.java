@@ -69,27 +69,27 @@ public class BarChart {
     }
 
     public void stroke() {
-        getPDFSize();
         setVariables();
         setBackground();
-        getTicSpacing();
 //        printNumScaleValues();
-        getGridLineDistance();
-        calculateBarSize();
-        calculateBarStartPoint();
-        createGridLines();
+        setGridLines();
         setXScale();
         setYScale();
         setTitle();
 //        printValues();
-        createBars();
+        setBars();
         setFrame();
     }
 
     private void setVariables() {
+        getPDFSize();
         if (chartWidth == 0) setChartWidth();
         if (xStart == 0) getXStart();
         if (yStart == 0) getYStart();
+        getTicSpacing();
+        getGridLineDistance();
+        calculateBarSize();
+        calculateBarStartPoint();
     }
 
     private void getGridLineDistance() {
@@ -161,8 +161,10 @@ public class BarChart {
     }
 
     private void calculateBarStartPoint() {
-        // starting point of the chart plus the amount you want to inset
-        barStartPoint = xStart + spacerWidth + (chartWidth * ((1 - barChartRatio) / 2));
+        float bWidth = getNumberOfBars() * barWidth;
+        float sWidth = (getNumberOfBars() - 1) * spacerWidth;
+        float total = bWidth + sWidth;
+        barStartPoint = xStart + yScaleOffset() + ((chartWidth - yScaleOffset() - total) * 0.5f);
     }
 
     /**
@@ -266,7 +268,7 @@ public class BarChart {
     /**
      * Draws bars on the chart
      */
-    private void createBars() {
+    private void setBars() {
         float x = barStartPoint;
         for (float height : ySeriesData) {
             pdfCanvas.setStrokeColor(getStrokeColor());
@@ -339,7 +341,7 @@ public class BarChart {
     /**
      * Draws gridlines if enabled
      */
-    private void createGridLines() {
+    private void setGridLines() {
         if (gridLinesVisable) {
             float scaleHeight = yStart;
             for (int i = 0; i < getNumberOfTics(); i++) {
