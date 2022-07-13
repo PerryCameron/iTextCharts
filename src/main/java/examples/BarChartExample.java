@@ -1,7 +1,8 @@
 package examples;
 
 
-import chart.BarChartImpl;
+import chart.BarChart;
+import chart.Chart;
 import com.itextpdf.kernel.colors.DeviceCmyk;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfPage;
@@ -37,13 +38,13 @@ public class BarChartExample {
                 "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022" };
         float[] yaxis = { 21, 19, 18, 15, 13, 27, 17, 19, 20, 15, 24, 17, 21, 18,
                 23, 26, 15, 17, 28, 15, 7};
-        BarChartImpl chart1 = new BarChartImpl(page);
+        BarChart chart1 = new BarChart(page);
         chart1.getChartColors().setBarColor(new DeviceCmyk(.12f, .05f, 0, 0.02f));
         chart1.getChartColors().setBackgroundColor(new DeviceCmyk(0, .02f, 0.15f, 0.01f));
         chart1.setChartHeight(200);
-        chart1.setxSeriesData(xaxis);
+        chart1.setXSeriesData(xaxis);
         chart1.setShowBorder(true);
-        chart1.setySeriesData(yaxis);
+        chart1.setYSeriesData(yaxis);
         chart1.setOutLineBars(true);
         chart1.setAutoScale(false);
         chart1.setVerticalStart(550);
@@ -54,11 +55,11 @@ public class BarChartExample {
 
         String[] xaxis1 = { "Guppy", "Goldfish", "Oscar", "Swordfish", "Shark" };
         float[] yaxis1 = { 101, 123, 78, 234, 102 };
-        BarChartImpl chart2 = new BarChartImpl(page);
+        BarChart chart2 = new BarChart(page);
         chart2.getChartColors().setMultiColoredBars(true);
         chart2.setChartSize(200,200);
-        chart2.setxSeriesData(xaxis1);
-        chart2.setySeriesData(yaxis1);
+        chart2.setXSeriesData(xaxis1);
+        chart2.setYSeriesData(yaxis1);
         chart2.setShowBorder(true);
         chart2.setOutLineBars(true);
         chart2.setVerticalStart(250);
@@ -69,12 +70,12 @@ public class BarChartExample {
 //        page = pdf.addNewPage();
         String[] xaxis2 = { "Time", "People", "Newsweek" };
         float[] yaxis2 = { 803, 852, 892};
-        BarChartImpl chart3 = new BarChartImpl(page);
+        Chart chart3 = new BarChart(page);
         chart3.getChartColors().setMultiColoredBars(true);
 //        chart3.getChartColors().setBackgroundColor(new DeviceCmyk(.12f, .05f, 0, 0.02f));
         chart3.setChartSize(200,350);
-        chart3.setxSeriesData(xaxis2);
-        chart3.setySeriesData(yaxis2);
+        chart3.setXSeriesData(xaxis2);
+        chart3.setYSeriesData(yaxis2);
         chart3.setStartPoint(350,120);
         chart3.setTitleFontSize(9);
         chart3.setTitle("Magazines Read Over lifetime");
