@@ -9,6 +9,8 @@ public class ChartColors {
     ArrayList<DeviceCmyk> barColors;
     private DeviceCmyk gridLineColor = new DeviceCmyk(.12f, .05f, 0, 0.02f);
     private DeviceCmyk scaleColor = new DeviceCmyk(0, 0, 0, 100);
+    private DeviceCmyk backgroundColor = new DeviceCmyk(0, 0, 0, 0);
+    private DeviceCmyk borderColor = new DeviceCmyk(0, 0, 0, 100);
 
     int numberOfColors = 0;
     int colorSelected = 0;
@@ -107,5 +109,21 @@ public class ChartColors {
 
     public void setScaleColor(DeviceCmyk scaleColor) {
         this.scaleColor = scaleColor;
+    }
+
+    public DeviceCmyk getBackgroundColor() {
+        return backgroundColor;
+    }
+
+    public void setBackgroundColor(DeviceCmyk backgroundColor) {
+        this.backgroundColor = backgroundColor;
+    }
+
+    public void setBorderColor(DeviceCmyk borderColor) {
+        this.borderColor = borderColor;
+    }
+
+    public DeviceCmyk getBorderColor() {
+        return borderColor;
     }
 }
