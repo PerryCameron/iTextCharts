@@ -2,7 +2,7 @@ package chart;
 
 import scaling.ChartColors;
 
-public class StackedBarChart implements Chart {
+public class StackedBarChart implements XYChart {
     @Override
     public void stroke() {
 

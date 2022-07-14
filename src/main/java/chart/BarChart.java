@@ -9,8 +9,12 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.properties.TextAlignment;
 import scaling.ChartColors;
 
-public class BarChart implements Chart {
+public class BarChart implements XYChart {
     // test data
+
+    // object to handle all colors
+    ChartColors chartColors = new ChartColors();
+
     private String[] xSeriesData;
     private float[] ySeriesData;
 
@@ -550,4 +554,6 @@ public class BarChart implements Chart {
     public ChartColors getChartColors() {
         return chartColors;
     }
+
+
 }

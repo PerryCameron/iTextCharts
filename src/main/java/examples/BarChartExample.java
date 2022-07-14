@@ -2,7 +2,6 @@ package examples;
 
 
 import chart.BarChart;
-import chart.Chart;
 import com.itextpdf.kernel.colors.DeviceCmyk;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfPage;
@@ -39,7 +38,7 @@ public class BarChartExample {
         float[] yaxis = { 21, 19, 18, 15, 13, 27, 17, 19, 20, 15, 24, 17, 21, 18,
                 23, 26, 15, 17, 28, 15, 7};
         BarChart chart1 = new BarChart(page);
-        chart1.getChartColors().setBarColor(new DeviceCmyk(.12f, .05f, 0, 0.02f));
+//        chart1.getChartColors().setBarColor(new DeviceCmyk(.12f, .05f, 0, 0.02f));
         chart1.getChartColors().setBackgroundColor(new DeviceCmyk(0, .02f, 0.15f, 0.01f));
         chart1.setChartHeight(200);
         chart1.setXSeriesData(xaxis);
@@ -51,6 +50,7 @@ public class BarChartExample {
         chart1.setTitleFontSize(20);
         chart1.getChartColors().setGridLineColor(new DeviceCmyk(64,0,6,3));
         chart1.setTitle("New Members By Year");
+        System.out.println("chart1.stroke();");
         chart1.stroke();
 
         String[] xaxis1 = { "Guppy", "Goldfish", "Oscar", "Swordfish", "Shark" };
@@ -66,6 +66,7 @@ public class BarChartExample {
         chart2.setTitleFontSize(15);
         chart2.setTitle("Types Of Fish Bought In 2022");
         chart2.stroke();
+        System.out.println("chart2.stroke();");
 
 //        page = pdf.addNewPage();
         String[] xaxis2 = { "Time", "People", "Newsweek" };
@@ -85,6 +86,7 @@ public class BarChartExample {
 //        chart3.setShowBorder(true);
 //        chart3.setGridLinesVisable(false);
         chart3.stroke();
+        System.out.println("chart3.stroke();");
 
         Document document = new Document(pdf);
         document.close();

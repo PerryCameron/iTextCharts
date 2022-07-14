@@ -63,6 +63,7 @@ public class ChartColors {
     }
 
     public void flushDefaultColors() {
+        System.out.println("flushDefaultColors()");
         barColors.clear();
         setColorChoice();
     }
@@ -73,6 +74,7 @@ public class ChartColors {
      * @param color
      */
     public void setBarColor(DeviceCmyk color) {
+        System.out.println("setBarColor(DeviceCmyk color)");
         flushDefaultColors();
         barColors.add(color);
         multiColored = false;

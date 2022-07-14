@@ -3,9 +3,8 @@ package chart;
 import scaling.ChartColors;
 import scaling.ChartScale;
 
-public interface Chart {
-    // object to handle all colors
-    ChartColors chartColors = new ChartColors();
+public interface XYChart {
+
     // object to handle scaling
     ChartScale chartScale = new ChartScale();
     //    the ratio the bars and spaces between them use in comparison to the width of the chart
@@ -67,9 +66,6 @@ public interface Chart {
      * Returns chart color object which has methods to manipulate the color scheme
      * @return
      */
-
-
-
 
     void setGridLinesVisable(boolean gridLinesVisable);
 
