@@ -16,10 +16,9 @@ public interface Chart {
     int RIGHT = 2;
 
     boolean VERTICAL = true;
-<<<<<<< HEAD
+
     boolean HORIZONTAL = false;
-=======
->>>>>>> 27eb5872ee9a040301b367f4f0acbbd9a0fffe12
+
 
 
     /**
@@ -69,12 +68,9 @@ public interface Chart {
      * @return
      */
 
-    default ChartColors getChartColors() {
-        return chartColors;
-    }
-<<<<<<< HEAD
+
+
 
     void setGridLinesVisable(boolean gridLinesVisable);
-=======
->>>>>>> 27eb5872ee9a040301b367f4f0acbbd9a0fffe12
+
 }

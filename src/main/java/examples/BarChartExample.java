@@ -70,7 +70,7 @@ public class BarChartExample {
 //        page = pdf.addNewPage();
         String[] xaxis2 = { "Time", "People", "Newsweek" };
         float[] yaxis2 = { 803, 852, 892};
-        Chart chart3 = new BarChart(page);
+        BarChart chart3 = new BarChart(page);
         chart3.getChartColors().setMultiColoredBars(true);
 //        chart3.getChartColors().setBackgroundColor(new DeviceCmyk(.12f, .05f, 0, 0.02f));
         chart3.setChartSize(200,350);

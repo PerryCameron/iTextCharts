@@ -18,20 +18,17 @@ public class StackedBarChart implements Chart {
 
     }
 
-    @Override
+
     public ChartColors getChartColors() {
         return null;
     }
 
     @Override
-<<<<<<< HEAD
     public void setGridLinesVisable(boolean gridLinesVisable) {
 
     }
 
     @Override
-=======
->>>>>>> 27eb5872ee9a040301b367f4f0acbbd9a0fffe12
     public void setXSeriesData(String[] xSeriesData) {
 
     }

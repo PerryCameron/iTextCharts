@@ -70,15 +70,15 @@ public class BarChart implements Chart {
     @Override
     public void stroke() {
         setVariables();
-        setBackground();
+        drawBackground();
 //        printNumScaleValues();
-        setGridLines();
-        setXScale();
-        setYScale();
+        drawGridLines();
+        drawXScale();
+        drawYScale();
         setTitle();
 //        printValues();
-        setBars();
-        setFrame();
+        drawBars();
+        drawFrame();
     }
 
     /**
@@ -189,16 +189,16 @@ public class BarChart implements Chart {
     /**
      * Draws the X scale, calls setXScaleMiniTics() method as well as setXScaleLabels()
      */
-    private void setXScale() {
+    private void drawXScale() {
         if(showXScale) {
             pdfCanvas.setStrokeColor(chartColors.getScaleColor());
             drawLine(xStart, yStart,xStart + chartWidth, yStart);
-            setXScaleMiniTics();
-            setXScaleLabels();
+            drawXScaleMiniTics();
+            drawXScaleLabels();
         }
     }
 
-    private void setXScaleMiniTics() {
+    private void drawXScaleMiniTics() {
         float startPoint = barStartPoint + (barWidth * 0.5f);
         for(int i = 0; i < getNumberOfBars(); i++) {
             pdfCanvas.setStrokeColor(chartColors.getScaleColor());
@@ -209,7 +209,7 @@ public class BarChart implements Chart {
         }
     }
 
-    private void setXScaleLabels() {
+    private void drawXScaleLabels() {
             float rectangleWidth = 24;
             float rectangleHeight = 80;
             float xAxisStartPoint = (barStartPoint + (barWidth * 0.5f)) - (rectangleWidth * 0.5f) + 1;
@@ -229,15 +229,15 @@ public class BarChart implements Chart {
         }
     }
 
-    private void setYScale() {
+    private void drawYScale() {
         if(showYScale) {
             drawLine(xStart + yScaleOffset(),yStart,xStart + yScaleOffset(),yStart + chartHeight);
-            createYScaleMiniTics();
-            setYScaleLabels();
+            drawYScaleMiniTics();
+            drawYScaleLabels();
         }
     }
 
-    private void createYScaleMiniTics() {
+    private void drawYScaleMiniTics() {
         float xAxisStartPoint = xStart + yScaleOffset();
         float miniTicSize = gridLineDistance / 5;
         float yMiniTicStart = yStart;
@@ -254,7 +254,7 @@ public class BarChart implements Chart {
     /**
      * Writes labels along y scale to interpret data value
      */
-    private void setYScaleLabels() {
+    private void drawYScaleLabels() {
         int increment = 0;
         float numTics = getNumberOfTics();
         if(autoScale)
@@ -285,7 +285,7 @@ public class BarChart implements Chart {
     /**
      * Draws bars on the chart
      */
-    private void setBars() {
+    private void drawBars() {
         float x = barStartPoint;
         for (float height : ySeriesData) {
             pdfCanvas.setStrokeColor(getStrokeColor());
@@ -298,7 +298,7 @@ public class BarChart implements Chart {
     /**
      * Sets the background color. Default is white
      */
-    private void setBackground() {
+    private void drawBackground() {
         float width = chartWidth - yScaleOffset();
         pdfCanvas.setStrokeColor(chartColors.getBackgroundColor());
         Rectangle rectangle = new Rectangle(xStart + yScaleOffset(), yStart, width, chartHeight);
@@ -309,7 +309,7 @@ public class BarChart implements Chart {
         return (chartWidth * ((1 - BAR_CHART_RATIO) / 2));
     }
 
-    private void setFrame() {
+    private void drawFrame() {
         if(showBorder) {
             pdfCanvas.setStrokeColor(chartColors.getBorderColor());
             // top
@@ -358,7 +358,7 @@ public class BarChart implements Chart {
     /**
      * Draws gridlines if enabled
      */
-    private void setGridLines() {
+    private void drawGridLines() {
         if (gridLinesVisable) {
             float scaleHeight = yStart;
             for (int i = 0; i < getNumberOfTics(); i++) {
@@ -545,5 +545,9 @@ public class BarChart implements Chart {
 
     public void setShowXScale(boolean showXScale) {
         this.showXScale = showXScale;
+    }
+
+    public ChartColors getChartColors() {
+        return chartColors;
     }
 }
