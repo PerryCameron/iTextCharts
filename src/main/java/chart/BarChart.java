@@ -8,17 +8,12 @@ import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.properties.TextAlignment;
 import scaling.ChartColors;
-import scaling.ChartScale;
 
-public class BarChart {
+public class BarChart implements Chart {
     // test data
     private String[] xSeriesData;
     private float[] ySeriesData;
 
-    // object to handle all colors
-    private final ChartColors chartColors = new ChartColors();
-    // object to handle scaling
-    private final ChartScale chartScale = new ChartScale();
     // this is the height given for the chart, does not include legend or numbers (200 default)
     private float chartHeight = 200;
     // entire width of the chart
@@ -32,7 +27,7 @@ public class BarChart {
     // determines if you want gridlines
     private boolean gridLinesVisable = true;
     // allows choice of bar colors (there is no limit)
-    private final boolean multiColoredBars = false;
+    private boolean multiColoredBars = false;
     // outline bars with a different color
     private boolean outLineBars = false;
     // chart will focus on data-points instead of starting xAxis at 0
@@ -44,7 +39,7 @@ public class BarChart {
     // shows x scale
     private boolean showXScale = true;
     // ratio of all the bars to the entire width of the chart
-    private final float barChartRatio = 0.95f;
+
     // standard margin sizes microsoft word uses
     private float pageMarginWidthSizeRatio = 0.15095f;
     // x-coordinate that the bars start on
@@ -68,6 +63,11 @@ public class BarChart {
         this.pdfCanvas = new PdfCanvas(page);
     }
 
+    /**
+     * This method is called when you want to draw the chart. All variables you wish to implement must be
+     * set before this method is called.
+     */
+    @Override
     public void stroke() {
         setVariables();
         setBackground();
@@ -81,6 +81,9 @@ public class BarChart {
         setFrame();
     }
 
+    /**
+     *  When stroke() is called on chart this method calculates values needed to create the chart
+     */
     private void setVariables() {
         getPDFSize();
         if (chartWidth == 0) setChartWidth();
@@ -92,6 +95,9 @@ public class BarChart {
         calculateBarStartPoint();
     }
 
+    /**
+     * Determines distance between gridlines also known as tics
+     */
     private void getGridLineDistance() {
         float numTics = (float) chartScale.getNumberOfTics();
         if(autoScale)
@@ -140,26 +146,39 @@ public class BarChart {
     }
 
     /**
-     * overloaded method, but this on is private and only used internally
+     * Creates a default width (margin to margin) for the chart if the width is not specified
+     * before calling stroke()
      */
     private void setChartWidth() {
         chartWidth = pdfPageWidth - (pdfPageWidth * pageMarginWidthSizeRatio) * 2;
     }
 
+    /**
+     * Creates a default x starting point for bottom-left corner of chart if it is not specified before calling stroke()
+     */
     private void getXStart() {
         xStart = pdfPageWidth * pageMarginWidthSizeRatio;
     }
 
+    /**
+     * Creates a default y starting point for bottom-left corner of chart if it is not specified before calling stroke()
+     */
     private void getYStart() {
         yStart = pdfPageHeight - chartHeight - (pdfPageHeight * 0.15f);
     }
 
+    /**
+     * Returns the size of the PDF page
+     */
     private void getPDFSize() {
         Rectangle thisPage = pdfCanvas.getDocument().getPage(1).getPageSize();
         this.pdfPageHeight = thisPage.getHeight();
         this.pdfPageWidth = thisPage.getWidth();
     }
 
+    /**
+     * Calculates where to start drawing bars
+     */
     private void calculateBarStartPoint() {
         float bWidth = getNumberOfBars() * barWidth;
         float sWidth = (getNumberOfBars() - 1) * spacerWidth;
@@ -168,14 +187,12 @@ public class BarChart {
     }
 
     /**
-     * Creates the X Axis Scale
+     * Draws the X scale, calls setXScaleMiniTics() method as well as setXScaleLabels()
      */
     private void setXScale() {
         if(showXScale) {
             pdfCanvas.setStrokeColor(chartColors.getScaleColor());
-            pdfCanvas.moveTo(xStart, yStart);
-            pdfCanvas.lineTo(xStart + chartWidth, yStart);
-            pdfCanvas.closePathStroke();
+            drawLine(xStart, yStart,xStart + chartWidth, yStart);
             setXScaleMiniTics();
             setXScaleLabels();
         }
@@ -289,7 +306,7 @@ public class BarChart {
     }
 
     private float yScaleOffset() {
-        return (chartWidth * ((1 - barChartRatio) / 2));
+        return (chartWidth * ((1 - BAR_CHART_RATIO) / 2));
     }
 
     private void setFrame() {
@@ -347,9 +364,7 @@ public class BarChart {
             for (int i = 0; i < getNumberOfTics(); i++) {
                 pdfCanvas.setStrokeColor(chartColors.getGridLineColor());
                 scaleHeight = scaleHeight + gridLineDistance;
-                pdfCanvas.moveTo(xStart + yScaleOffset(), scaleHeight);
-                pdfCanvas.lineTo(xStart + chartWidth, scaleHeight);
-                pdfCanvas.closePathStroke();
+                drawLine(xStart + yScaleOffset(), scaleHeight,xStart + chartWidth, scaleHeight);
             }
         }
     }
@@ -367,7 +382,7 @@ public class BarChart {
      */
     private void calculateBarSize() {
         // divide 90% of chartWidth by the number of bars
-        float barsAndSpacers = (chartWidth * barChartRatio) / (getNumberOfBars());
+        float barsAndSpacers = (chartWidth * BAR_CHART_RATIO) / (getNumberOfBars());
         // this will give the width of space between bars
         // ratio of the space between the bars to the size of the bars
         float barSpaceRatio = 0.3f;
@@ -402,13 +417,7 @@ public class BarChart {
         chartScale.setMinMaxPoints(minmax[0], minmax[1]);
     }
 
-    /**
-     * Returns chart color object which has methods to manipulate the color scheme
-     * @return
-     */
-    public ChartColors getChartColors() {
-        return chartColors;
-    }
+
 
     /**
      * Sets page margins that the chart will respect if chart width is not set
@@ -422,7 +431,7 @@ public class BarChart {
      * Chart Data
      * @param xSeriesData
      */
-    public void setxSeriesData(String[] xSeriesData) {
+    public void setXSeriesData(String[] xSeriesData) {
         this.xSeriesData = xSeriesData;
     }
 
@@ -430,7 +439,7 @@ public class BarChart {
      * Data used to label the chart data
      * @param ySeriesData
      */
-    public void setySeriesData(float[] ySeriesData) {
+    public void setYSeriesData(float[] ySeriesData) {
         this.ySeriesData = ySeriesData;
     }
 
@@ -467,6 +476,7 @@ public class BarChart {
     public void setChartWidth(float chartWidth) {
         this.chartWidth = chartWidth;
     }
+
     /**
      * Sets the height of the chart
      * @param chartHeight
