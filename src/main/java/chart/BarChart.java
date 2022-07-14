@@ -12,8 +12,6 @@ import scaling.ChartColors;
 public class BarChart implements XYChart {
     // test data
 
-    // object to handle all colors
-    ChartColors chartColors = new ChartColors();
 
     private String[] xSeriesData;
     private float[] ySeriesData;
@@ -42,9 +40,7 @@ public class BarChart implements XYChart {
     private boolean showYScale = true;
     // shows x scale
     private boolean showXScale = true;
-    // ratio of all the bars to the entire width of the chart
-
-    // standard margin sizes microsoft word uses
+    // standard margin sizes Microsoft Word uses
     private float pageMarginWidthSizeRatio = 0.15095f;
     // x-coordinate that the bars start on
     private float barStartPoint;
@@ -297,6 +293,8 @@ public class BarChart implements XYChart {
             pdfCanvas.rectangle(rectangle).setFillColor(chartColors.nextBarColor()).fillStroke();
             x = x + barWidth + spacerWidth;
         }
+        // resets the palette for the next chart
+        getChartColors().setToFirstColor();
     }
 
     /**
@@ -551,9 +549,11 @@ public class BarChart implements XYChart {
         this.showXScale = showXScale;
     }
 
-    public ChartColors getChartColors() {
-        return chartColors;
+    public boolean isMultiColoredBars() {
+        return multiColoredBars;
     }
 
-
+    public void setMultiColoredBars(boolean multiColoredBars) {
+        this.multiColoredBars = multiColoredBars;
+    }
 }

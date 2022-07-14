@@ -5,6 +5,8 @@ import scaling.ChartScale;
 
 public interface XYChart {
 
+    // object to handle all colors
+    ChartColors chartColors = new ChartColors();
     // object to handle scaling
     ChartScale chartScale = new ChartScale();
     //    the ratio the bars and spaces between them use in comparison to the width of the chart
@@ -68,5 +70,10 @@ public interface XYChart {
      */
 
     void setGridLinesVisable(boolean gridLinesVisable);
+
+
+    default ChartColors getChartColors() {
+        return chartColors;
+    }
 
 }

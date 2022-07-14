@@ -6,31 +6,54 @@ import java.util.ArrayList;
 
 public class ChartColors {
 
-    ArrayList<DeviceCmyk> barColors;
-    private DeviceCmyk gridLineColor = new DeviceCmyk(.12f, .05f, 0, 0.02f);
-    private DeviceCmyk scaleColor = new DeviceCmyk(0, 0, 0, 100);
-    private DeviceCmyk backgroundColor = new DeviceCmyk(0, 0, 0, 0);
-    private DeviceCmyk borderColor = new DeviceCmyk(0, 0, 0, 100);
+    ArrayList<DeviceCmyk> barColorPalette;
+    private DeviceCmyk gridLineColor = setDefaultGridLineColor();
+    private DeviceCmyk scaleColor = setDefaultScaleColor();
+    private DeviceCmyk backgroundColor = setDefaultBackgroundColor();
+    private DeviceCmyk borderColor = setDefaultBorderColor();
 
     int numberOfColors = 0;
     int colorSelected = 0;
     boolean multiColored = false;
 
     public ChartColors() {
-        this.barColors = new ArrayList<>();
+        this.barColorPalette = new ArrayList<>();
         addDefaultColors();
     }
 
+    public void resetDefaultColors() {
+        gridLineColor = setDefaultGridLineColor();
+        scaleColor = setDefaultScaleColor();
+        backgroundColor = setDefaultBackgroundColor();
+        borderColor = setDefaultBorderColor();
+    }
+
+    public  DeviceCmyk setDefaultGridLineColor() {
+        return new DeviceCmyk(.12f, .05f, 0, 0.02f);
+    }
+
+    public  DeviceCmyk setDefaultScaleColor() {
+        return new DeviceCmyk(0, 0, 0, 100);
+    }
+
+    public  DeviceCmyk setDefaultBackgroundColor() {
+        return new DeviceCmyk(0, 0, 0, 0);
+    }
+
+    public  DeviceCmyk setDefaultBorderColor() {
+        return new DeviceCmyk(0, 0, 0, 100);
+    }
+
     public void addDefaultColors() {
-        barColors.add(new DeviceCmyk(0.79f, 0.33f, 0, 0.11f));
-        barColors.add(new DeviceCmyk(0,0.06f,0.09f,0.73f));
-        barColors.add(new DeviceCmyk(0,0.55f,0.71f,0.11f));
-        barColors.add(new DeviceCmyk(0.02f,0,0.53f,0.04f));
-        barColors.add(new DeviceCmyk(0.03f,0,0.05f,0.03f));
-        barColors.add(new DeviceCmyk(0.33f,0.11f,0,0.55f));
-        barColors.add(new DeviceCmyk(0.28f,0.11f,0,0.26f));
-        barColors.add(new DeviceCmyk(0.22f,0.02f,0,0.22f));
-        barColors.add(new DeviceCmyk(0.10f,0.11f,0,0.17f));
+        barColorPalette.add(new DeviceCmyk(0.79f, 0.33f, 0, 0.11f));
+        barColorPalette.add(new DeviceCmyk(0,0.06f,0.09f,0.73f));
+        barColorPalette.add(new DeviceCmyk(0,0.55f,0.71f,0.11f));
+        barColorPalette.add(new DeviceCmyk(0.02f,0,0.53f,0.04f));
+        barColorPalette.add(new DeviceCmyk(0.03f,0,0.05f,0.03f));
+        barColorPalette.add(new DeviceCmyk(0.33f,0.11f,0,0.55f));
+        barColorPalette.add(new DeviceCmyk(0.28f,0.11f,0,0.26f));
+        barColorPalette.add(new DeviceCmyk(0.22f,0.02f,0,0.22f));
+        barColorPalette.add(new DeviceCmyk(0.10f,0.11f,0,0.17f));
         setColorChoice();
     }
 
@@ -41,52 +64,55 @@ public class ChartColors {
     public DeviceCmyk nextBarColor() {
         DeviceCmyk color;
         if(multiColored) {
-            color = barColors.get(colorSelected);
-            if (colorSelected == barColors.size() - 1)
+            // gets current color selected on palette
+            color = barColorPalette.get(colorSelected);
+            // move to next color, unless we have reached the end of the palette then start over
+            if (colorSelected == barColorPalette.size() - 1)
                 colorSelected = 0;
             else
                 colorSelected++;
             return color;
         } else
-            color = barColors.get(0);
+            color = barColorPalette.get(colorSelected);
         // if we are not doing multi colors then first color in array is the bar color
         return color;
     }
 
     public DeviceCmyk currentBarColor() {
-            return barColors.get(colorSelected);
+            return barColorPalette.get(colorSelected);
     }
 
     public void setColorChoice() {
-        numberOfColors = barColors.size();
+        numberOfColors = barColorPalette.size();
         colorSelected = 0;
     }
 
-    public void flushDefaultColors() {
-        System.out.println("flushDefaultColors()");
-        barColors.clear();
+    public void setToFirstColor() {
+        colorSelected = 0;
+    }
+
+    public void flushBarColorPalette() {
+        barColorPalette.clear();
         setColorChoice();
     }
 
     /**
-     * This is for use if you are only using one color for your bar, It will remove all colors from the array,
-     * set multiColored to false and put the color you chose into the array
-     * @param color
+     * This is for use if you are only using one color for your bar, It will choose the color element you want on,
+     * the palette and set multiColored to false.
+     * @param colorSelected
      */
-    public void setBarColor(DeviceCmyk color) {
-        System.out.println("setBarColor(DeviceCmyk color)");
-        flushDefaultColors();
-        barColors.add(color);
+    public void setBarColorSelected(int colorSelected) {
+        this.colorSelected = colorSelected;
         multiColored = false;
     }
 
     public void addColor(DeviceCmyk color) {
-        barColors.add(color);
+        barColorPalette.add(color);
         setColorChoice();
     }
 
-    public ArrayList<DeviceCmyk> getBarColors() {
-        return barColors;
+    public ArrayList<DeviceCmyk> getBarColorPalette() {
+        return barColorPalette;
     }
 
     public boolean isMultiColored() {

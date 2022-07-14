@@ -38,7 +38,7 @@ public class BarChartExample {
         float[] yaxis = { 21, 19, 18, 15, 13, 27, 17, 19, 20, 15, 24, 17, 21, 18,
                 23, 26, 15, 17, 28, 15, 7};
         BarChart chart1 = new BarChart(page);
-//        chart1.getChartColors().setBarColor(new DeviceCmyk(.12f, .05f, 0, 0.02f));
+        chart1.getChartColors().setBarColorSelected(0);
         chart1.getChartColors().setBackgroundColor(new DeviceCmyk(0, .02f, 0.15f, 0.01f));
         chart1.setChartHeight(200);
         chart1.setXSeriesData(xaxis);
@@ -56,6 +56,7 @@ public class BarChartExample {
         String[] xaxis1 = { "Guppy", "Goldfish", "Oscar", "Swordfish", "Shark" };
         float[] yaxis1 = { 101, 123, 78, 234, 102 };
         BarChart chart2 = new BarChart(page);
+        chart2.getChartColors().resetDefaultColors();
         chart2.getChartColors().setMultiColoredBars(true);
         chart2.setChartSize(200,200);
         chart2.setXSeriesData(xaxis1);
@@ -72,6 +73,7 @@ public class BarChartExample {
         String[] xaxis2 = { "Time", "People", "Newsweek" };
         float[] yaxis2 = { 803, 852, 892};
         BarChart chart3 = new BarChart(page);
+        chart3.getChartColors().resetDefaultColors();
         chart3.getChartColors().setMultiColoredBars(true);
 //        chart3.getChartColors().setBackgroundColor(new DeviceCmyk(.12f, .05f, 0, 0.02f));
         chart3.setChartSize(200,350);
