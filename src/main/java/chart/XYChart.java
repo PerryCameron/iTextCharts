@@ -15,6 +15,9 @@ public interface XYChart {
     int LEFT = 0;
     int CENTER = 1;
     int RIGHT = 2;
+    int LARGE_TO_SMALL = 3;
+    int SMALL_TO_LARGE = 4;
+    int STANDARD = 5;
 
     boolean VERTICAL = true;
 
@@ -42,9 +45,9 @@ public interface XYChart {
      */
     void setChartSize(float width, float height);
 
-    void setXSeriesData(String[] xSeriesData);
-
-    void setYSeriesData(float[] ySeriesData);
+//    void setXSeriesData(String[] xSeriesData);
+//
+//    void setYSeriesData(float[] ySeriesData);
 
     void setVerticalStart(float y);
 

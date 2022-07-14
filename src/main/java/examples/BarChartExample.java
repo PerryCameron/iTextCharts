@@ -2,6 +2,7 @@ package examples;
 
 
 import chart.BarChart;
+import chart.Data;
 import com.itextpdf.kernel.colors.DeviceCmyk;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfPage;
@@ -12,6 +13,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class BarChartExample {
 
@@ -38,12 +40,16 @@ public class BarChartExample {
         float[] yaxis = { 21, 19, 18, 15, 13, 27, 17, 19, 20, 15, 24, 17, 21, 18,
                 23, 26, 15, 17, 28, 15, 7};
         BarChart chart1 = new BarChart(page);
+        for(int i = 0; i < xaxis.length; i++) {
+            chart1.setData(new Data<String, Float> (xaxis[i],yaxis[i]));
+        }
+
         chart1.getChartColors().setBarColorSelected(0);
         chart1.getChartColors().setBackgroundColor(new DeviceCmyk(0, .02f, 0.15f, 0.01f));
         chart1.setChartHeight(200);
-        chart1.setXSeriesData(xaxis);
+//        chart1.setXSeriesData(xaxis);
         chart1.setShowBorder(true);
-        chart1.setYSeriesData(yaxis);
+//        chart1.setYSeriesData(yaxis);
         chart1.setOutLineBars(true);
         chart1.setAutoScale(false);
         chart1.setVerticalStart(550);
@@ -53,42 +59,42 @@ public class BarChartExample {
         System.out.println("chart1.stroke();");
         chart1.stroke();
 
-        String[] xaxis1 = { "Guppy", "Goldfish", "Oscar", "Swordfish", "Shark" };
-        float[] yaxis1 = { 101, 123, 78, 234, 102 };
-        BarChart chart2 = new BarChart(page);
-        chart2.getChartColors().resetDefaultColors();
-        chart2.getChartColors().setMultiColoredBars(true);
-        chart2.setChartSize(200,200);
-        chart2.setXSeriesData(xaxis1);
-        chart2.setYSeriesData(yaxis1);
-        chart2.setShowBorder(true);
-        chart2.setOutLineBars(true);
-        chart2.setVerticalStart(250);
-        chart2.setTitleFontSize(15);
-        chart2.setTitle("Types Of Fish Bought In 2022");
-        chart2.stroke();
-        System.out.println("chart2.stroke();");
-
-//        page = pdf.addNewPage();
-        String[] xaxis2 = { "Time", "People", "Newsweek" };
-        float[] yaxis2 = { 803, 852, 892};
-        BarChart chart3 = new BarChart(page);
-        chart3.getChartColors().resetDefaultColors();
-        chart3.getChartColors().setMultiColoredBars(true);
-//        chart3.getChartColors().setBackgroundColor(new DeviceCmyk(.12f, .05f, 0, 0.02f));
-        chart3.setChartSize(200,350);
-        chart3.setXSeriesData(xaxis2);
-        chart3.setYSeriesData(yaxis2);
-        chart3.setStartPoint(350,120);
-        chart3.setTitleFontSize(9);
-        chart3.setTitle("Magazines Read Over lifetime");
-        chart3.getChartColors().setGridLineColor(new DeviceCmyk(0,0.78f,0.78f,0.08f));
-        chart3.setShowBorder(true);
-        chart3.getChartColors().setBorderColor(new DeviceCmyk(0,0.78f,0.78f,0.08f));
+//        String[] xaxis1 = { "Guppy", "Goldfish", "Oscar", "Swordfish", "Shark" };
+//        float[] yaxis1 = { 101, 123, 78, 234, 102 };
+//        BarChart chart2 = new BarChart(page);
+//        chart2.getChartColors().resetDefaultColors();
+//        chart2.getChartColors().setMultiColoredBars(true);
+//        chart2.setChartSize(200,200);
+//        chart2.setXSeriesData(xaxis1);
+//        chart2.setYSeriesData(yaxis1);
+//        chart2.setShowBorder(true);
+//        chart2.setOutLineBars(true);
+//        chart2.setVerticalStart(250);
+//        chart2.setTitleFontSize(15);
+//        chart2.setTitle("Types Of Fish Bought In 2022");
+//        chart2.stroke();
+//        System.out.println("chart2.stroke();");
+//
+////        page = pdf.addNewPage();
+//        String[] xaxis2 = { "Time", "People", "Newsweek" };
+//        float[] yaxis2 = { 803, 852, 892};
+//        BarChart chart3 = new BarChart(page);
+//        chart3.getChartColors().resetDefaultColors();
+//        chart3.getChartColors().setMultiColoredBars(true);
+////        chart3.getChartColors().setBackgroundColor(new DeviceCmyk(.12f, .05f, 0, 0.02f));
+//        chart3.setChartSize(200,350);
+//        chart3.setXSeriesData(xaxis2);
+//        chart3.setYSeriesData(yaxis2);
+//        chart3.setStartPoint(350,120);
+//        chart3.setTitleFontSize(9);
+//        chart3.setTitle("Magazines Read Over lifetime");
+//        chart3.getChartColors().setGridLineColor(new DeviceCmyk(0,0.78f,0.78f,0.08f));
 //        chart3.setShowBorder(true);
-//        chart3.setGridLinesVisable(false);
-        chart3.stroke();
-        System.out.println("chart3.stroke();");
+//        chart3.getChartColors().setBorderColor(new DeviceCmyk(0,0.78f,0.78f,0.08f));
+////        chart3.setShowBorder(true);
+////        chart3.setGridLinesVisable(false);
+//        chart3.stroke();
+//        System.out.println("chart3.stroke();");
 
         Document document = new Document(pdf);
         document.close();

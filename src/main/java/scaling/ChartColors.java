@@ -18,7 +18,7 @@ public class ChartColors {
 
     public ChartColors() {
         this.barColorPalette = new ArrayList<>();
-        addDefaultColors();
+        addPaletteDefaultColors();
     }
 
     public void resetDefaultColors() {
@@ -44,7 +44,7 @@ public class ChartColors {
         return new DeviceCmyk(0, 0, 0, 100);
     }
 
-    public void addDefaultColors() {
+    public void addPaletteDefaultColors() {
         barColorPalette.add(new DeviceCmyk(0.79f, 0.33f, 0, 0.11f));
         barColorPalette.add(new DeviceCmyk(0,0.06f,0.09f,0.73f));
         barColorPalette.add(new DeviceCmyk(0,0.55f,0.71f,0.11f));

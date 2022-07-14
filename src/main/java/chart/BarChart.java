@@ -6,15 +6,19 @@ import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.properties.TextAlignment;
-import scaling.ChartColors;
+
+import java.util.ArrayList;
 
 public class BarChart implements XYChart {
     // test data
 
 
-    private String[] xSeriesData;
-    private float[] ySeriesData;
+//    private String[] xSeriesData;
+//    private float[] ySeriesData;
+
+    ArrayList<Data> data = new ArrayList<>();
 
     // this is the height given for the chart, does not include legend or numbers (200 default)
     private float chartHeight = 200;
@@ -219,7 +223,7 @@ public class BarChart implements XYChart {
 //            pdfCanvas.rectangle(rectangle);
 //            pdfCanvas.stroke();
             Canvas canvas = new Canvas(pdfCanvas, rectangle);
-            canvas.add(new Paragraph(xSeriesData[i])
+            canvas.add(new Paragraph(String.valueOf(data.get(i).getX()))
                     .setTextAlignment(TextAlignment.CENTER)
                     .setFontColor(chartColors.getScaleColor())
                             .setFontSize(9)
@@ -287,9 +291,9 @@ public class BarChart implements XYChart {
      */
     private void drawBars() {
         float x = barStartPoint;
-        for (float height : ySeriesData) {
+        for (Data d : data) {
             pdfCanvas.setStrokeColor(getStrokeColor());
-            Rectangle rectangle = new Rectangle(x, yStart, barWidth, calculateBarHeight(height));
+            Rectangle rectangle = new Rectangle(x, yStart, barWidth, calculateBarHeight((Float) d.getY()));
             pdfCanvas.rectangle(rectangle).setFillColor(chartColors.nextBarColor()).fillStroke();
             x = x + barWidth + spacerWidth;
         }
@@ -376,7 +380,7 @@ public class BarChart implements XYChart {
      * @return
      */
     private float getNumberOfBars() {
-        return xSeriesData.length;
+        return data.size();
     }
 
     /**
@@ -398,13 +402,13 @@ public class BarChart implements XYChart {
      * @return
      */
     private float[] getMinMaxStats() {
-        float maxSize = ySeriesData[0], minSize = ySeriesData[0];
+        float maxSize = (float) data.get(0).getY(), minSize = (float) data.get(0).getY();
         float[] result = new float[2];
-        for (float height : ySeriesData) {
-            if (height > maxSize)
-                maxSize = height;
-            if (height < minSize)
-                minSize = height;
+        for (Data d : data) {
+            if ((float) d.getY() > maxSize)
+                maxSize = (float) d.getY();
+            if ((float) d.getY() < minSize)
+                minSize = (float) d.getY();
         }
         result[0] = minSize;
         result[1] = maxSize;
@@ -433,17 +437,17 @@ public class BarChart implements XYChart {
      * Chart Data
      * @param xSeriesData
      */
-    public void setXSeriesData(String[] xSeriesData) {
-        this.xSeriesData = xSeriesData;
-    }
+//    public void setXSeriesData(String[] xSeriesData) {
+//        this.xSeriesData = xSeriesData;
+//    }
 
     /**
      * Data used to label the chart data
      * @param ySeriesData
      */
-    public void setYSeriesData(float[] ySeriesData) {
-        this.ySeriesData = ySeriesData;
-    }
+//    public void setYSeriesData(float[] ySeriesData) {
+//        this.ySeriesData = ySeriesData;
+//    }
 
     /**
      * Sets the (x,y) coordinate for the start location of the chart. This is the bottom left corner
@@ -555,5 +559,13 @@ public class BarChart implements XYChart {
 
     public void setMultiColoredBars(boolean multiColoredBars) {
         this.multiColoredBars = multiColoredBars;
+    }
+
+    public ArrayList<Data> getData() {
+        return data;
+    }
+
+    public <X,Y> void setData(Data<X, Y> data) {
+        this.data.add(data);
     }
 }

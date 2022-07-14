@@ -28,15 +28,15 @@ public class StackedBarChart implements XYChart {
 
     }
 
-    @Override
-    public void setXSeriesData(String[] xSeriesData) {
-
-    }
-
-    @Override
-    public void setYSeriesData(float[] ySeriesData) {
-
-    }
+//    @Override
+//    public void setXSeriesData(String[] xSeriesData) {
+//
+//    }
+//
+//    @Override
+//    public void setYSeriesData(float[] ySeriesData) {
+//
+//    }
 
     @Override
     public void setVerticalStart(float y) {
