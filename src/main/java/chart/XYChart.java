@@ -3,8 +3,13 @@ package chart;
 import scaling.ChartColors;
 import scaling.ChartScale;
 
-public interface XYChart {
+import java.util.ArrayList;
+import java.util.List;
 
+public abstract class XYChart<X, Y> {
+
+//    private final List<XYChart.Data<X, Y>> data = new ArrayList();
+    private final List<ArrayList<XYChart.Data<X,Y>>> series = new ArrayList<>();
     // object to handle all colors
     ChartColors chartColors = new ChartColors();
     // object to handle scaling
@@ -29,54 +34,109 @@ public interface XYChart {
      * This method is called when you want to draw the chart. All variables you wish to implement must be
      * set before this method is called.
      */
-    void stroke();
+    abstract void stroke();
 
     /**
      * Sets the (x,y) coordinate for the start location of the chart. This is the bottom left corner
      * @param x
      * @param y
      */
-    void setStartPoint(float x, float y);
+    abstract void setStartPoint(float x, float y);
 
     /**
      * Sets the size of the chart
      * @param width
      * @param height
      */
-    void setChartSize(float width, float height);
+    abstract void setChartSize(float width, float height);
 
 //    void setXSeriesData(String[] xSeriesData);
 //
 //    void setYSeriesData(float[] ySeriesData);
 
-    void setVerticalStart(float y);
+    abstract void setVerticalStart(float y);
 
-    void setHorizontalStart(float x);
+    abstract void setHorizontalStart(float x);
 
-    void setChartWidth(float chartWidth);
+    abstract void setChartWidth(float chartWidth);
 
-    void setChartHeight(float chartHeight);
+    abstract void setChartHeight(float chartHeight);
 
-    void setTitle(String title);
+    abstract void setTitle(String title);
 
-    void setTitleFontSize(float titleFontSize);
+    abstract void setTitleFontSize(float titleFontSize);
 
-    void setShowBorder(boolean showBorder);
+    abstract void setShowBorder(boolean showBorder);
 
-    void setShowYScale(boolean showYScale);
+    abstract void setShowYScale(boolean showYScale);
 
-    void setShowXScale(boolean showXScale);
+    abstract void setShowXScale(boolean showXScale);
 
     /**
      * Returns chart color object which has methods to manipulate the color scheme
      * @return
      */
 
-    void setGridLinesVisable(boolean gridLinesVisable);
+    abstract void setGridLinesVisable(boolean gridLinesVisable);
 
+    public List<ArrayList<Data<X, Y>>> getSeries() {
+        return series;
+    }
 
-    default ChartColors getChartColors() {
+    public ChartColors getChartColors() {
         return chartColors;
     }
+
+     <N> float convertToFloat(N number)  {
+        if(number instanceof Float)
+            return (float) number;
+        else if(number instanceof Integer)
+            return  ((Integer) number).floatValue();
+        else if(number instanceof Double)
+            return  ((Double) number).floatValue();
+        else if(number instanceof Long)
+            return  ((Long) number).floatValue();
+        else if(number instanceof Short)
+            return ((Short) number).floatValue();
+        return 0;
+    }
+
+
+
+    public final static class Data<X,Y> {
+        X x;
+        Y y;
+        public Data(X x, Y y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        public X getX() {
+            return x;
+        }
+
+        private void setX(X x) {
+            this.x = x;
+        }
+
+        public  Y getY() {
+            return y;
+        }
+
+        public void setY(Y y) {
+            this.y = y;
+        }
+    }
+
+//    public final static class Series<X,Y> {
+//        private List<Data<X, Y>> displayedData;
+//        X x;
+//        Y y;
+//
+//        public Series(X x, Y y) {
+//            this.x = x;
+//            this.y = y;
+//        }
+//    }
 
 }

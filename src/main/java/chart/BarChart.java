@@ -9,15 +9,11 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.properties.TextAlignment;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class BarChart implements XYChart {
-    // test data
+public class BarChart<X, Y> extends XYChart<X, Y> {
 
-
-//    private String[] xSeriesData;
-//    private float[] ySeriesData;
-
-    ArrayList<Data> data = new ArrayList<>();
+    private List<BarChart.Data<X,Y>> data;
 
     // this is the height given for the chart, does not include legend or numbers (200 default)
     private float chartHeight = 200;
@@ -70,7 +66,7 @@ public class BarChart implements XYChart {
      * This method is called when you want to draw the chart. All variables you wish to implement must be
      * set before this method is called.
      */
-    @Override
+
     public void stroke() {
         setVariables();
         drawBackground();
@@ -415,17 +411,6 @@ public class BarChart implements XYChart {
         return result;
     }
 
-    private <N> float convertToFloat(N number)  {
-        if(number instanceof Float)
-            return (float) number;
-        else if(number instanceof Integer)
-            return  ((Integer) number).floatValue();
-        else if(number instanceof Double)
-            return  ((Double) number).floatValue();
-        else if(number instanceof Long)
-            return  ((Long) number).floatValue();
-    return 0;
-    }
 
     /**
      *
@@ -435,6 +420,14 @@ public class BarChart implements XYChart {
         chartScale.setMinMaxPoints(minmax[0], minmax[1]);
     }
 
+//    public void sortData() {
+////        for(Data d: data) {
+////            d.setY(convertToFloat(d.getY()));
+////        }
+////        data.arraylist.sort(Comparator.comparing(Data::getY));
+//        Collections.sort(data, Comparator.comparing(Data::getY).reversed());
+////        System.out.println(data.contains());
+//    }
 
 
     /**
@@ -444,22 +437,6 @@ public class BarChart implements XYChart {
     public void setPageMarginWidthSizeRatio(float pageMarginWidthSizeRatio) {
         this.pageMarginWidthSizeRatio = pageMarginWidthSizeRatio;
     }
-
-    /**
-     * Chart Data
-     * @param xSeriesData
-     */
-//    public void setXSeriesData(String[] xSeriesData) {
-//        this.xSeriesData = xSeriesData;
-//    }
-
-    /**
-     * Data used to label the chart data
-     * @param ySeriesData
-     */
-//    public void setYSeriesData(float[] ySeriesData) {
-//        this.ySeriesData = ySeriesData;
-//    }
 
     /**
      * Sets the (x,y) coordinate for the start location of the chart. This is the bottom left corner
@@ -573,39 +550,11 @@ public class BarChart implements XYChart {
         this.multiColoredBars = multiColoredBars;
     }
 
-    public ArrayList<Data> getData() {
+    public List<Data<X, Y>> getData() {
         return data;
     }
 
-    public <X,Y> void setData(Data<X, Y> data) {
-        this.data.add(data);
-    }
-
-    final public static class Data<X,Y> {
-
-        X x;
-        Y y;
-
-        public Data(X x, Y y) {
-            this.x = x;
-            this.y = y;
-        }
-
-
-        public X getX() {
-            return x;
-        }
-
-        private void setX(X x) {
-            this.x = x;
-        }
-
-        public Y getY() {
-            return y;
-        }
-
-        public void setY(Y y) {
-            this.y = y;
-        }
+    public void setData(List<Data<X, Y>> data) {
+        this.data = data;
     }
 }
