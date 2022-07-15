@@ -17,6 +17,8 @@ public abstract class XYChart<X, Y> {
     //    the ratio the bars and spaces between them use in comparison to the width of the chart
     float BAR_CHART_RATIO = 0.95f;
 
+
+    int SINGLE_SERIES_CHART = 1;
     int LEFT = 0;
     int CENTER = 1;
     int RIGHT = 2;
@@ -101,8 +103,6 @@ public abstract class XYChart<X, Y> {
         return 0;
     }
 
-
-
     public final static class Data<X,Y> {
         X x;
         Y y;
@@ -128,15 +128,65 @@ public abstract class XYChart<X, Y> {
         }
     }
 
-//    public final static class Series<X,Y> {
-//        private List<Data<X, Y>> displayedData;
-//        X x;
-//        Y y;
-//
-//        public Series(X x, Y y) {
-//            this.x = x;
-//            this.y = y;
-//        }
-//    }
+    public final static class DataSet<X,Y> {
+        private ArrayList<BarChart.Data<X,Y>> set;
+
+        private String setName;
+
+        public DataSet() {
+            this.set = new ArrayList<>();
+        }
+
+        public void add(BarChart.Data<X,Y> data) {
+            set.add(data);
+        }
+
+        public ArrayList<BarChart.Data<X,Y>> getSet() {
+            return set;
+        }
+
+        public int size() {
+            return getSet().size();
+        }
+
+        public String getSetName() {
+            return setName;
+        }
+
+        public void setSetName(String setName) {
+            this.setName = setName;
+        }
+    }
+
+    public final static class Series<X,Y> {
+        String name = "";
+        private ArrayList<ArrayList<Data<X, Y>>> series;
+
+
+        public Series() {
+            this.series = new ArrayList<>();
+        }
+
+        public void setDataSet(ArrayList<Data<X, Y>> series) {
+            this.series.add(series);
+        }
+
+
+        public void clear() {
+            series.clear();
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public ArrayList<ArrayList<Data<X, Y>>> getSeries() {
+            return series;
+        }
+    }
 
 }

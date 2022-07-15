@@ -11,9 +11,12 @@ import com.itextpdf.layout.properties.TextAlignment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BarChart<X, Y> extends XYChart<X, Y> {
+public class BarChart<X, Y> extends XYChart<X,Y> {
 
-    private List<BarChart.Data<X,Y>> data;
+    // will be obsolete
+//    private List<BarChart.Data<X,Y>> data;
+    private List<ArrayList<Data<X, Y>>> series;
+
 
     // this is the height given for the chart, does not include legend or numbers (200 default)
     private float chartHeight = 200;
@@ -218,7 +221,7 @@ public class BarChart<X, Y> extends XYChart<X, Y> {
 //            pdfCanvas.rectangle(rectangle);
 //            pdfCanvas.stroke();
             Canvas canvas = new Canvas(pdfCanvas, rectangle);
-            canvas.add(new Paragraph(String.valueOf(data.get(i).getX()))
+            canvas.add(new Paragraph(String.valueOf(series.get(0).get(0).getX()))
                     .setTextAlignment(TextAlignment.CENTER)
                     .setFontColor(chartColors.getScaleColor())
                             .setFontSize(9)
@@ -286,7 +289,7 @@ public class BarChart<X, Y> extends XYChart<X, Y> {
      */
     private void drawBars() {
         float x = barStartPoint;
-        for (Data d : data) {
+        for (Data d : series.get(0)) {
             pdfCanvas.setStrokeColor(getStrokeColor());
             Rectangle rectangle = new Rectangle(x, yStart, barWidth, calculateBarHeight(convertToFloat(d.getY())));
             pdfCanvas.rectangle(rectangle).setFillColor(chartColors.nextBarColor()).fillStroke();
@@ -375,7 +378,7 @@ public class BarChart<X, Y> extends XYChart<X, Y> {
      * @return
      */
     private float getNumberOfBars() {
-        return data.size();
+        return series.get(0).size();
     }
 
     /**
@@ -397,9 +400,9 @@ public class BarChart<X, Y> extends XYChart<X, Y> {
      * @return
      */
     private float[] getMinMaxStats() {
-        float maxSize = convertToFloat(data.get(0).getY()), minSize = convertToFloat(data.get(0).getY());
+        float maxSize = convertToFloat(series.get(0).get(0).getY()), minSize = convertToFloat(series.get(0).get(0).getY());
         float[] result = new float[2];
-        for (Data d : data) {
+        for (Data d : series.get(0)) {
             float number = convertToFloat(d.getY());
             if (number > maxSize)
                 maxSize = number;
@@ -550,11 +553,12 @@ public class BarChart<X, Y> extends XYChart<X, Y> {
         this.multiColoredBars = multiColoredBars;
     }
 
-    public List<Data<X, Y>> getData() {
-        return data;
+    @Override
+    public List<ArrayList<Data<X, Y>>> getSeries() {
+        return series;
     }
 
-    public void setData(List<Data<X, Y>> data) {
-        this.data = data;
+    public void setSeries(ArrayList<ArrayList<Data<X, Y>>> series) {
+        this.series = series;
     }
 }
