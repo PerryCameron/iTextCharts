@@ -6,7 +6,6 @@ import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.properties.TextAlignment;
 
 import java.util.ArrayList;
@@ -293,7 +292,7 @@ public class BarChart implements XYChart {
         float x = barStartPoint;
         for (Data d : data) {
             pdfCanvas.setStrokeColor(getStrokeColor());
-            Rectangle rectangle = new Rectangle(x, yStart, barWidth, calculateBarHeight((Float) d.getY()));
+            Rectangle rectangle = new Rectangle(x, yStart, barWidth, calculateBarHeight(convertToFloat(d.getY())));
             pdfCanvas.rectangle(rectangle).setFillColor(chartColors.nextBarColor()).fillStroke();
             x = x + barWidth + spacerWidth;
         }
@@ -402,17 +401,30 @@ public class BarChart implements XYChart {
      * @return
      */
     private float[] getMinMaxStats() {
-        float maxSize = (float) data.get(0).getY(), minSize = (float) data.get(0).getY();
+        float maxSize = convertToFloat(data.get(0).getY()), minSize = convertToFloat(data.get(0).getY());
         float[] result = new float[2];
         for (Data d : data) {
-            if ((float) d.getY() > maxSize)
-                maxSize = (float) d.getY();
-            if ((float) d.getY() < minSize)
-                minSize = (float) d.getY();
+            float number = convertToFloat(d.getY());
+            if (number > maxSize)
+                maxSize = number;
+            if (number < minSize)
+                minSize = number;
         }
         result[0] = minSize;
         result[1] = maxSize;
         return result;
+    }
+
+    private <N> float convertToFloat(N number)  {
+        if(number instanceof Float)
+            return (float) number;
+        else if(number instanceof Integer)
+            return  ((Integer) number).floatValue();
+        else if(number instanceof Double)
+            return  ((Double) number).floatValue();
+        else if(number instanceof Long)
+            return  ((Long) number).floatValue();
+    return 0;
     }
 
     /**
@@ -567,5 +579,33 @@ public class BarChart implements XYChart {
 
     public <X,Y> void setData(Data<X, Y> data) {
         this.data.add(data);
+    }
+
+    final public static class Data<X,Y> {
+
+        X x;
+        Y y;
+
+        public Data(X x, Y y) {
+            this.x = x;
+            this.y = y;
+        }
+
+
+        public X getX() {
+            return x;
+        }
+
+        private void setX(X x) {
+            this.x = x;
+        }
+
+        public Y getY() {
+            return y;
+        }
+
+        public void setY(Y y) {
+            this.y = y;
+        }
     }
 }
