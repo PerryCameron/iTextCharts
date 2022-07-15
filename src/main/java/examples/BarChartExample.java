@@ -40,15 +40,16 @@ public class BarChartExample {
                 23, 26, 15, 17, 28, 15, 7};
         // Create the bar chart
         BarChart<String,Number> chart1 = new BarChart<>(page);
-        // Create the Array to hold data
-//        List<BarChart.Data<String,Number>> chartData1 = new ArrayList<>();
+        // Create a data set for the chart
         XYChart.DataSet dataSet1 = new XYChart.DataSet();
+        // Create a series to hold 1 or more data sets
         XYChart.Series series1 = new XYChart.Series();
-        // Put data into the array
+        // Put data into the data set
         for(int i = 0; i < xaxis.length; i++)
             dataSet1.add(new BarChart.Data<String, Number> (xaxis[i],yaxis[i]));
-        // Set the Array to the chart
+        // put data set into the series
         series1.setDataSet(dataSet1.getSet());
+        // put series into the chart
         chart1.setSeries(series1.getSeries());
         chart1.getChartColors().setBarColorSelected(0);
         chart1.getChartColors().setBackgroundColor(new DeviceCmyk(0, .02f, 0.15f, 0.01f));
@@ -64,46 +65,50 @@ public class BarChartExample {
 //        chart1.sortData();
         chart1.stroke();
 
-//        String[] xaxis1 = { "Guppy", "Goldfish", "Oscar", "Swordfish", "Shark" };
-//        float[] yaxis1 = { 101, 123, 78, 234, 102 };
-//        BarChart<String,Number> chart2 = new BarChart<>(page);
-//        XYChart.DataSet series2 = new XYChart.DataSet();
-//        for(int i = 0; i < xaxis1.length; i++)
-//            series2.add(new BarChart.Data<String, Number> (xaxis1[i],yaxis1[i]));
-//        chart2.setData(series2.getSet());
-//        chart2.getChartColors().resetDefaultColors();
-//        chart2.getChartColors().setMultiColoredBars(true);
-//        chart2.setChartSize(200,200);
-//        chart2.setShowBorder(true);
-//        chart2.setOutLineBars(true);
-//        chart2.setVerticalStart(250);
-//        chart2.setTitleFontSize(15);
-//        chart2.setTitle("Types Of Fish Bought In 2022");
-//        chart2.stroke();
-//        System.out.println("chart2.stroke();");
-//
-////        page = pdf.addNewPage();
-//        String[] xaxis2 = { "Time", "People", "Newsweek" };
-//        float[] yaxis2 = { 803, 852, 892};
-//        BarChart<String,Number> chart3 = new BarChart(page);
-//        XYChart.DataSet series3 = new XYChart.DataSet();
-//        for(int i = 0; i < xaxis2.length; i++)
-//            series3.add(new BarChart.Data<String, Number> (xaxis2[i],yaxis2[i]));
-//        chart3.setData(series3.getSet());
-//        chart3.getChartColors().resetDefaultColors();
-//        chart3.getChartColors().setMultiColoredBars(true);
-////        chart3.getChartColors().setBackgroundColor(new DeviceCmyk(.12f, .05f, 0, 0.02f));
-//        chart3.setChartSize(200,350);
-//        chart3.setStartPoint(350,120);
-//        chart3.setTitleFontSize(9);
-//        chart3.setTitle("Magazines Read Over lifetime");
-//        chart3.getChartColors().setGridLineColor(new DeviceCmyk(0,0.78f,0.78f,0.08f));
+        String[] xaxis1 = { "Guppy", "Goldfish", "Oscar", "Swordfish", "Shark" };
+        float[] yaxis1 = { 101, 123, 78, 234, 102 };
+        BarChart<String,Number> chart2 = new BarChart<>(page);
+        XYChart.DataSet dataSet2 = new XYChart.DataSet();
+        XYChart.Series series2 = new XYChart.Series();
+        for(int i = 0; i < xaxis1.length; i++)
+            dataSet2.add(new BarChart.Data<String, Number> (xaxis1[i],yaxis1[i]));
+        series2.setDataSet(dataSet2.getSet());
+        chart2.setSeries(series2.getSeries());
+        chart2.getChartColors().resetDefaultColors();
+        chart2.getChartColors().setMultiColoredBars(true);
+        chart2.setChartSize(200,200);
+        chart2.setShowBorder(true);
+        chart2.setOutLineBars(true);
+        chart2.setVerticalStart(250);
+        chart2.setTitleFontSize(15);
+        chart2.setTitle("Types Of Fish Bought In 2022");
+        chart2.stroke();
+        System.out.println("chart2.stroke();");
+
+//        page = pdf.addNewPage();
+        String[] xaxis2 = { "Time", "People", "Newsweek" };
+        float[] yaxis2 = { 803, 852, 892};
+        BarChart<String,Number> chart3 = new BarChart(page);
+        XYChart.DataSet dataSet3 = new XYChart.DataSet();
+        XYChart.Series series3 = new XYChart.Series();
+        for(int i = 0; i < xaxis2.length; i++)
+            dataSet3.add(new BarChart.Data<String, Number> (xaxis2[i],yaxis2[i]));
+        series3.setDataSet(dataSet3.getSet());
+        chart3.setSeries(series3.getSeries());
+        chart3.getChartColors().resetDefaultColors();
+        chart3.getChartColors().setMultiColoredBars(true);
+//        chart3.getChartColors().setBackgroundColor(new DeviceCmyk(.12f, .05f, 0, 0.02f));
+        chart3.setChartSize(200,350);
+        chart3.setStartPoint(350,120);
+        chart3.setTitleFontSize(9);
+        chart3.setTitle("Magazines Read Over lifetime");
+        chart3.getChartColors().setGridLineColor(new DeviceCmyk(0,0.78f,0.78f,0.08f));
+        chart3.setShowBorder(true);
+        chart3.getChartColors().setBorderColor(new DeviceCmyk(0,0.78f,0.78f,0.08f));
 //        chart3.setShowBorder(true);
-//        chart3.getChartColors().setBorderColor(new DeviceCmyk(0,0.78f,0.78f,0.08f));
-////        chart3.setShowBorder(true);
-////        chart3.setGridLinesVisable(false);
-//        chart3.stroke();
-//        System.out.println("chart3.stroke();");
+//        chart3.setGridLinesVisable(false);
+        chart3.stroke();
+        System.out.println("chart3.stroke();");
 
 
         Document document = new Document(pdf);

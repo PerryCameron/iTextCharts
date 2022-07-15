@@ -42,6 +42,8 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     private boolean showYScale = true;
     // shows x scale
     private boolean showXScale = true;
+
+    private boolean singleSeries = false;
     // standard margin sizes Microsoft Word uses
     private float pageMarginWidthSizeRatio = 0.15095f;
     // x-coordinate that the bars start on
@@ -88,6 +90,8 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
      */
     private void setVariables() {
         getPDFSize();
+        // if there is only one element in our series array this is a single series chart
+        if(getSeries().size() == SINGLE_SERIES_CHART) singleSeries = true;
         if (chartWidth == 0) setChartWidth();
         if (xStart == 0) getXStart();
         if (yStart == 0) getYStart();
@@ -221,7 +225,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
 //            pdfCanvas.rectangle(rectangle);
 //            pdfCanvas.stroke();
             Canvas canvas = new Canvas(pdfCanvas, rectangle);
-            canvas.add(new Paragraph(String.valueOf(series.get(0).get(0).getX()))
+            canvas.add(new Paragraph(String.valueOf(series.get(0).get(i).getX()))
                     .setTextAlignment(TextAlignment.CENTER)
                     .setFontColor(chartColors.getScaleColor())
                             .setFontSize(9)
