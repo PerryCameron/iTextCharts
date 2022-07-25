@@ -1,5 +1,6 @@
 package chart;
 
+import exception.DataIntegrityException;
 import scaling.ChartColors;
 import scaling.ChartScale;
 
@@ -133,7 +134,7 @@ public abstract class XYChart<X, Y> {
 
     public final static class DataSet<X,Y> extends ArrayList<BarChart.Data<X,Y>> {
 
-        private String name;
+        private String name = "";
 
         public DataSet() {
         }
@@ -147,32 +148,32 @@ public abstract class XYChart<X, Y> {
         }
     }
 
-    public final static class Series<X,Y> {
-
-        private ArrayList<ArrayList<Data<X, Y>>> series;
-
+    public final static class Series<X,Y> extends ArrayList<ArrayList<Data<X, Y>>> {
 
         public Series() {
-            this.series = new ArrayList<>();
         }
 
-        public void add(ArrayList<Data<X, Y>> series) {
-            this.series.add(series);
-        }
-
-        public void addAll(DataSet... args) {
+        public void addAll(DataSet... args)  {
+            int dataSize = args[0].size();
             for(DataSet arg: args) {
-                this.series.add((ArrayList<Data<X, Y>>) arg);
+                this.add((ArrayList<Data<X, Y>>) arg);
+                try {
+                    checkDataSize(dataSize, arg);
+                } catch (DataIntegrityException e) {
+                    e.printStackTrace();
+                }
             }
+
         }
 
-        public void clear() {
-            series.clear();
+        private void checkDataSize(int dataSize, DataSet arg) throws DataIntegrityException {
+            if(dataSize != arg.size())
+                throw new DataIntegrityException("Data Set " + arg.getClass().getName() + " does not match in size to other datasets");
         }
 
-        public ArrayList<ArrayList<Data<X, Y>>> getSeries() {
-            return series;
-        }
+
     }
+
+
 
 }

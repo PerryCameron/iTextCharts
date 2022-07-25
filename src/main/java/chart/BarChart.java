@@ -75,8 +75,8 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         drawBackground();
 //        printNumScaleValues();
         drawGridLines();
-        drawXScale();
-        drawYScale();
+        drawCatagoryScale();
+        drawValueScale();
         setTitle();
 //        printValues();
         drawBars();
@@ -200,16 +200,16 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     /**
      * Draws the X scale, calls setXScaleMiniTics() method as well as setXScaleLabels()
      */
-    private void drawXScale() {
+    private void drawCatagoryScale() {
         if(showXScale) {
             pdfCanvas.setStrokeColor(chartColors.getScaleColor());
             drawLine(xStart, yStart,xStart + chartWidth, yStart);
-            drawXScaleMiniTics();
-            drawXScaleLabels();
+            drawCatagoryScaleMiniTics();
+            drawCatagoryScaleLabels();
         }
     }
 
-    private void drawXScaleMiniTics() {
+    private void drawCatagoryScaleMiniTics() {
         float startPoint = barStartPoint + (barWidth * 0.5f);
         for(int i = 0; i < getNumberOfBars(); i++) {
             pdfCanvas.setStrokeColor(chartColors.getScaleColor());
@@ -220,7 +220,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         }
     }
 
-    private void drawXScaleLabels() {
+    private void drawCatagoryScaleLabels() {
             float rectangleWidth = 24;
             float rectangleHeight = 80;
             float xAxisStartPoint = (barStartPoint + (barWidth * 0.5f)) - (rectangleWidth * 0.5f) + 1;
@@ -240,15 +240,15 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         }
     }
 
-    private void drawYScale() {
+    private void drawValueScale() {
         if(showYScale) {
             drawLine(xStart + yScaleOffset(),yStart,xStart + yScaleOffset(),yStart + chartHeight);
-            drawYScaleMiniTics();
-            drawYScaleLabels();
+            drawValueScaleMiniTics();
+            drawValueScaleLabels();
         }
     }
 
-    private void drawYScaleMiniTics() {
+    private void drawValueScaleMiniTics() {
         float xAxisStartPoint = xStart + yScaleOffset();
         float miniTicSize = gridLineDistance / 5;
         float yMiniTicStart = yStart;
@@ -265,7 +265,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     /**
      * Writes labels along y scale to interpret data value
      */
-    private void drawYScaleLabels() {
+    private void drawValueScaleLabels() {
         int increment = 0;
         float numTics = getNumberOfTics();
         if(autoScale)
@@ -298,12 +298,14 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
      */
     private void drawBars() {
         float x = barStartPoint;
-        for (Data d : series.get(0)) {
-            pdfCanvas.setStrokeColor(getStrokeColor());
-            Rectangle rectangle = new Rectangle(x, yStart, barWidth, calculateBarHeight(convertToFloat(d.getY())));
-            pdfCanvas.rectangle(rectangle).setFillColor(chartColors.nextBarColor()).fillStroke();
-            x = x + barWidth + spacerWidth;
-        }
+//        if(isSingleDataSet()) {
+            for (Data d : series.get(0)) {
+                pdfCanvas.setStrokeColor(getStrokeColor());
+                Rectangle rectangle = new Rectangle(x, yStart, barWidth, calculateBarHeight(convertToFloat(d.getY())));
+                pdfCanvas.rectangle(rectangle).setFillColor(chartColors.nextBarColor()).fillStroke();
+                x = x + barWidth + spacerWidth;
+            }
+//        }
         // resets the palette for the next chart
         getChartColors().setToFirstColor();
     }
@@ -435,15 +437,6 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         float[] minmax = getMinMaxStats();
         chartScale.setMinMaxPoints(minmax[0], minmax[1]);
     }
-
-//    public void sortData() {
-////        for(Data d: data) {
-////            d.setY(convertToFloat(d.getY()));
-////        }
-////        data.arraylist.sort(Comparator.comparing(Data::getY));
-//        Collections.sort(data, Comparator.comparing(Data::getY).reversed());
-////        System.out.println(data.contains());
-//    }
 
 
     /**
