@@ -131,7 +131,7 @@ public abstract class XYChart<X, Y> {
     public final static class DataSet<X,Y> {
         private ArrayList<BarChart.Data<X,Y>> set;
 
-        private String setName;
+        private String name;
 
         public DataSet() {
             this.set = new ArrayList<>();
@@ -149,12 +149,12 @@ public abstract class XYChart<X, Y> {
             return getSet().size();
         }
 
-        public String getSetName() {
-            return setName;
+        public String getName() {
+            return name;
         }
 
-        public void setSetName(String setName) {
-            this.setName = setName;
+        public void setName(String name) {
+            this.name = name;
         }
     }
 

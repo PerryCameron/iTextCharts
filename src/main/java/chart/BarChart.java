@@ -30,7 +30,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     private float gridLineDistance;
     // determines if you want gridlines
     private boolean gridLinesVisable = true;
-    // allows choice of bar colors (there is no limit)
+    // allows choice of bar colors (there is no limit) only used if chart has one series
     private boolean multiColoredBars = false;
     // outline bars with a different color
     private boolean outLineBars = false;
