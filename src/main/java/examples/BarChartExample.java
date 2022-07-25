@@ -48,7 +48,7 @@ public class BarChartExample {
         for(int i = 0; i < xaxis.length; i++)
             dataSet1.add(new BarChart.Data<String, Number> (xaxis[i],yaxis[i]));
         // put data set into the series
-        series1.setDataSet(dataSet1.getSet());
+        series1.add(dataSet1);
         // put series into the chart
         chart1.setSeries(series1.getSeries());
         chart1.getChartColors().setBarColorSelected(0);
@@ -65,15 +65,21 @@ public class BarChartExample {
 //        chart1.sortData();
         chart1.stroke();
 
-        String[] xaxis1 = { "Guppy", "Goldfish", "Oscar", "Swordfish", "Shark" };
-        float[] yaxis1 = { 101, 123, 78, 234, 102 };
+        String[] chart2Xaxis1 = { "Guppy", "Goldfish", "Oscar", "Swordfish", "Shark" };
+        float[] chart2Yaxis1 = { 101, 123, 78, 234, 102 };
+        float[] chart2Yaxis2 = { 121, 143, 98, 250, 118 };
         BarChart<String,Number> chart2 = new BarChart<>(page);
-        XYChart.DataSet dataSet2 = new XYChart.DataSet();
-        XYChart.Series series2 = new XYChart.Series();
-        for(int i = 0; i < xaxis1.length; i++)
-            dataSet2.add(new BarChart.Data<String, Number> (xaxis1[i],yaxis1[i]));
-        series2.setDataSet(dataSet2.getSet());
-        chart2.setSeries(series2.getSeries());
+        XYChart.DataSet chart2dataSet1 = new XYChart.DataSet();
+        XYChart.DataSet chart2dataSet2 = new XYChart.DataSet();
+        XYChart.Series chart2Series = new XYChart.Series();
+        for(int i = 0; i < chart2Xaxis1.length; i++) {
+            chart2dataSet1.add(new BarChart.Data<String, Number>(chart2Xaxis1[i], chart2Yaxis1[i]));
+            chart2dataSet2.add(new BarChart.Data<String, Number>(chart2Xaxis1[i], chart2Yaxis2[i]));
+        }
+//        chart2Series.add(chart2dataSet1.getSet());
+//        chart2Series.add(chart2dataSet2.getSet());
+        chart2Series.addAll(chart2dataSet1,chart2dataSet2);
+        chart2.setSeries(chart2Series.getSeries());
         chart2.getChartColors().resetDefaultColors();
         chart2.getChartColors().setMultiColoredBars(true);
         chart2.setChartSize(200,200);
@@ -84,6 +90,9 @@ public class BarChartExample {
         chart2.setTitle("Types Of Fish Bought In 2022");
         chart2.stroke();
         System.out.println("chart2.stroke();");
+        System.out.println("singelSeries= " + chart2.isSingleDataSet());
+        System.out.println("multi-colored=" + chart2.getChartColors().isMultiColored());
+
 
 //        page = pdf.addNewPage();
         String[] xaxis2 = { "Time", "People", "Newsweek" };
@@ -93,7 +102,7 @@ public class BarChartExample {
         XYChart.Series series3 = new XYChart.Series();
         for(int i = 0; i < xaxis2.length; i++)
             dataSet3.add(new BarChart.Data<String, Number> (xaxis2[i],yaxis2[i]));
-        series3.setDataSet(dataSet3.getSet());
+        series3.add(dataSet3);
         chart3.setSeries(series3.getSeries());
         chart3.getChartColors().resetDefaultColors();
         chart3.getChartColors().setMultiColoredBars(true);

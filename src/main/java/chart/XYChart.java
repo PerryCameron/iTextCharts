@@ -3,6 +3,7 @@ package chart;
 import scaling.ChartColors;
 import scaling.ChartScale;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public abstract class XYChart<X, Y> {
     float BAR_CHART_RATIO = 0.95f;
 
 
-    int SINGLE_SERIES_CHART = 1;
+    int SINGLE_DATA_SET = 1;
     int LEFT = 0;
     int CENTER = 1;
     int RIGHT = 2;
@@ -100,6 +101,8 @@ public abstract class XYChart<X, Y> {
             return  ((Long) number).floatValue();
         else if(number instanceof Short)
             return ((Short) number).floatValue();
+        else if(number instanceof BigDecimal)
+            return ((BigDecimal) number).floatValue();
         return 0;
     }
 
@@ -128,25 +131,11 @@ public abstract class XYChart<X, Y> {
         }
     }
 
-    public final static class DataSet<X,Y> {
-        private ArrayList<BarChart.Data<X,Y>> set;
+    public final static class DataSet<X,Y> extends ArrayList<BarChart.Data<X,Y>> {
 
         private String name;
 
         public DataSet() {
-            this.set = new ArrayList<>();
-        }
-
-        public void add(BarChart.Data<X,Y> data) {
-            set.add(data);
-        }
-
-        public ArrayList<BarChart.Data<X,Y>> getSet() {
-            return set;
-        }
-
-        public int size() {
-            return getSet().size();
         }
 
         public String getName() {
@@ -159,7 +148,7 @@ public abstract class XYChart<X, Y> {
     }
 
     public final static class Series<X,Y> {
-        String name = "";
+
         private ArrayList<ArrayList<Data<X, Y>>> series;
 
 
@@ -167,21 +156,18 @@ public abstract class XYChart<X, Y> {
             this.series = new ArrayList<>();
         }
 
-        public void setDataSet(ArrayList<Data<X, Y>> series) {
+        public void add(ArrayList<Data<X, Y>> series) {
             this.series.add(series);
         }
 
+        public void addAll(DataSet... args) {
+            for(DataSet arg: args) {
+                this.series.add((ArrayList<Data<X, Y>>) arg);
+            }
+        }
 
         public void clear() {
             series.clear();
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
         }
 
         public ArrayList<ArrayList<Data<X, Y>>> getSeries() {

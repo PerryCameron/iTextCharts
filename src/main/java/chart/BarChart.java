@@ -30,8 +30,6 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     private float gridLineDistance;
     // determines if you want gridlines
     private boolean gridLinesVisable = true;
-    // allows choice of bar colors (there is no limit) only used if chart has one series
-    private boolean multiColoredBars = false;
     // outline bars with a different color
     private boolean outLineBars = false;
     // chart will focus on data-points instead of starting xAxis at 0
@@ -42,8 +40,8 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     private boolean showYScale = true;
     // shows x scale
     private boolean showXScale = true;
-
-    private boolean singleSeries = false;
+    // do we have only one data set in our series?
+    private boolean singleDataSet = false;
     // standard margin sizes Microsoft Word uses
     private float pageMarginWidthSizeRatio = 0.15095f;
     // x-coordinate that the bars start on
@@ -91,10 +89,17 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     private void setVariables() {
         getPDFSize();
         // if there is only one element in our series array this is a single series chart
-        if(getSeries().size() == SINGLE_SERIES_CHART) singleSeries = true;
+        if(getSeries().size() == SINGLE_DATA_SET) {
+            singleDataSet = true;
+            // we have more than one data set, so this feature is off
+            // because it uses different colors for different data sets
+        } else {
+            getChartColors().setMultiColoredBars(false);
+        }
         if (chartWidth == 0) setChartWidth();
         if (xStart == 0) getXStart();
         if (yStart == 0) getYStart();
+
         getTicSpacing();
         getGridLineDistance();
         calculateBarSize();
@@ -404,14 +409,18 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
      * @return
      */
     private float[] getMinMaxStats() {
+        // starts them in the correct range
         float maxSize = convertToFloat(series.get(0).get(0).getY()), minSize = convertToFloat(series.get(0).get(0).getY());
         float[] result = new float[2];
-        for (Data d : series.get(0)) {
-            float number = convertToFloat(d.getY());
-            if (number > maxSize)
-                maxSize = number;
-            if (number < minSize)
-                minSize = number;
+        int i;
+        for(i = 0; i < series.size(); i++){
+            for (Data d : series.get(i)) {
+                float number = convertToFloat(d.getY());
+                if (number > maxSize)
+                    maxSize = number;
+                if (number < minSize)
+                    minSize = number;
+            }
         }
         result[0] = minSize;
         result[1] = maxSize;
@@ -549,13 +558,6 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         this.showXScale = showXScale;
     }
 
-    public boolean isMultiColoredBars() {
-        return multiColoredBars;
-    }
-
-    public void setMultiColoredBars(boolean multiColoredBars) {
-        this.multiColoredBars = multiColoredBars;
-    }
 
     @Override
     public List<ArrayList<Data<X, Y>>> getSeries() {
@@ -564,5 +566,13 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
 
     public void setSeries(ArrayList<ArrayList<Data<X, Y>>> series) {
         this.series = series;
+    }
+
+    public boolean isSingleDataSet() {
+        return singleDataSet;
+    }
+
+    public void setSingleDataSet(boolean singleDataSet) {
+        this.singleDataSet = singleDataSet;
     }
 }
