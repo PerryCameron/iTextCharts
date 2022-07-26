@@ -170,6 +170,10 @@ public abstract class XYChart<X, Y> {
             dataSet.clear();
         }
 
+        public Data<X, Y> get(int element) {
+            return dataSet.get(element);
+        }
+
     }
 
     public final static class Series<X,Y> extends ArrayList<DataSet<X, Y>> {
@@ -177,26 +181,59 @@ public abstract class XYChart<X, Y> {
         public Series() {
         }
 
+        /**
+         * Adds multiple sets to the ArrayList at the same time and makes a couple of checks to make sure the
+         * data is good
+         * @param args
+         */
         public void addAll(DataSet... args)  {
-            int dataSize = args[0].size();
             for(DataSet arg: args) {
                 this.add(arg);
+            }
+            checkIntegrity();
+        }
+
+        /**
+         * Calls two functions to make sure the data sets are of the same length and that the categories match.
+         */
+        public void checkIntegrity() {
+            int size = get(0).getDataSet().size();
+            for(DataSet d: this) {
                 try {
-                    checkDataSize(dataSize, arg);
+                    checkDataSize(size, d);
+                    checkCategoryMatch(d);
                 } catch (DataIntegrityException e) {
                     e.printStackTrace();
                 }
             }
         }
 
-        private void checkDataSize(int dataSize, DataSet arg) throws DataIntegrityException {
-            if(dataSize != arg.size())
-                throw new DataIntegrityException("Data Set " + arg.getName() + " does not match in size to other datasets in the series");
+        /**
+         * Checks to make sure categories for all the data sets put into the series match
+         * @param d
+         * @throws DataIntegrityException
+         */
+        private void checkCategoryMatch(DataSet d) throws DataIntegrityException{
+            // prevents checking the first data set against itself
+            if(!d.equals(this.get(0)))
+            for(int i = 0; i < this.get(0).getDataSet().size(); i++) {
+                if(!(this.get(0).get(i).getX().equals(d.get(i).getX())))
+                    throw new DataIntegrityException("Data Set " + d.getName() + " categories do not match data set "
+                        + this.get(0).getName() + " in this series");
+                else System.out.println("match");
+            }
         }
 
-
+        /**
+         * Checks to make sure all the data sets are of the same length
+         * @param dataSize
+         * @param dataSet
+         * @throws DataIntegrityException
+         */
+        private void checkDataSize(int dataSize, DataSet dataSet) throws DataIntegrityException {
+            if(dataSize != dataSet.size())
+                throw new DataIntegrityException("Data Set " + dataSet.getName() + " is a different size than data set "
+                        + this.get(0).getName() + " in this series");
+        }
     }
-
-
-
 }
