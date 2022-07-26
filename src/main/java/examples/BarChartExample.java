@@ -61,9 +61,11 @@ public class BarChartExample {
         chart1.setTitleFontSize(20);
         chart1.getChartColors().setGridLineColor(new DeviceCmyk(64,0,6,3));
         chart1.setTitle("New Members By Year");
+        System.out.println("________________________________________________________");
         System.out.println("chart1.stroke();");
-//        chart1.sortData();
         chart1.stroke();
+        System.out.println("singleDataSet= " + chart1.isSingleDataSet());
+        System.out.println("multi-colored=" + chart1.getChartColors().isMultiColored());
 
         String[] chart2Xaxis1 = { "Guppy", "Goldfish", "Oscar", "Swordfish", "Shark" };
         String[] chart2Xaxis2 = { "Guppy", "Goldfish", "Oscar", "Swordfish", "Shark" };
@@ -77,8 +79,8 @@ public class BarChartExample {
             chart2DataSet1.add(new BarChart.Data<String, Number>(chart2Xaxis1[i], chart2Yaxis1[i]));
             chart2DataSet2.add(new BarChart.Data<String, Number>(chart2Xaxis2[i], chart2Yaxis2[i]));
         }
-        chart2DataSet2.remove(0);
-        System.out.println("set1="+ chart2DataSet1.size() + " set2=" + chart2DataSet2.size());
+//        chart2DataSet2.remove(0);
+
         chart2Series.addAll(chart2DataSet1,chart2DataSet2);
         chart2.setSeries(chart2Series);
         chart2.getChartColors().resetDefaultColors();
@@ -89,9 +91,11 @@ public class BarChartExample {
         chart2.setVerticalStart(250);
         chart2.setTitleFontSize(15);
         chart2.setTitle("Types Of Fish Bought In 2022");
-        chart2.stroke();
+        System.out.println("________________________________________________________");
+
         System.out.println("chart2.stroke();");
-        System.out.println("singelSeries= " + chart2.isSingleDataSet());
+        chart2.stroke();
+        System.out.println("singleDataSet= " + chart2.isSingleDataSet());
         System.out.println("multi-colored=" + chart2.getChartColors().isMultiColored());
 
 
@@ -117,9 +121,11 @@ public class BarChartExample {
         chart3.getChartColors().setBorderColor(new DeviceCmyk(0,0.78f,0.78f,0.08f));
 //        chart3.setShowBorder(true);
 //        chart3.setGridLinesVisable(false);
-        chart3.stroke();
+        System.out.println("________________________________________________________");
         System.out.println("chart3.stroke();");
-
+        chart3.stroke();
+        System.out.println("singleDataSet= " + chart3.isSingleDataSet());
+        System.out.println("multi-colored=" + chart3.getChartColors().isMultiColored());
 
         Document document = new Document(pdf);
         document.close();

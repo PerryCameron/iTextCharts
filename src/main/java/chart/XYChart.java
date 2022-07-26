@@ -132,11 +132,21 @@ public abstract class XYChart<X, Y> {
         }
     }
 
-    public final static class DataSet<X,Y> extends ArrayList<BarChart.Data<X,Y>> {
+    public final static class DataSet<X,Y>   {
+
+        ArrayList<BarChart.Data<X,Y>> dataSet = new ArrayList<>();
 
         private String name = "";
 
         public DataSet() {
+        }
+
+        public void add(BarChart.Data<X,Y> data) {
+            dataSet.add(data);
+        }
+
+        public int size() {
+            return dataSet.size();
         }
 
         public String getName() {
@@ -146,9 +156,14 @@ public abstract class XYChart<X, Y> {
         public void setName(String name) {
             this.name = name;
         }
+
+        public ArrayList<Data<X, Y>> getDataSet() {
+            return dataSet;
+        }
+
     }
 
-    public final static class Series<X,Y> extends ArrayList<ArrayList<Data<X, Y>>> {
+    public final static class Series<X,Y> extends ArrayList<DataSet<X, Y>> {
 
         public Series() {
         }
@@ -156,14 +171,13 @@ public abstract class XYChart<X, Y> {
         public void addAll(DataSet... args)  {
             int dataSize = args[0].size();
             for(DataSet arg: args) {
-                this.add((ArrayList<Data<X, Y>>) arg);
+                this.add(arg);
                 try {
                     checkDataSize(dataSize, arg);
                 } catch (DataIntegrityException e) {
                     e.printStackTrace();
                 }
             }
-
         }
 
         private void checkDataSize(int dataSize, DataSet arg) throws DataIntegrityException {

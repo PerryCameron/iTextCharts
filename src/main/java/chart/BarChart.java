@@ -9,13 +9,12 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.properties.TextAlignment;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class BarChart<X, Y> extends XYChart<X,Y> {
 
     // will be obsolete
 //    private List<BarChart.Data<X,Y>> data;
-    private List<ArrayList<Data<X, Y>>> series;
+    private ArrayList<DataSet<X, Y>> series;
 
 
     // this is the height given for the chart, does not include legend or numbers (200 default)
@@ -88,8 +87,9 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
      */
     private void setVariables() {
         getPDFSize();
+        System.out.println("series size= " + series.size());
         // if there is only one element in our series array this is a single series chart
-        if(getSeries().size() == SINGLE_DATA_SET) {
+        if(series.size() == SINGLE_DATA_SET) {
             singleDataSet = true;
             // we have more than one data set, so this feature is off
             // because it uses different colors for different data sets
@@ -230,7 +230,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
 //            pdfCanvas.rectangle(rectangle);
 //            pdfCanvas.stroke();
             Canvas canvas = new Canvas(pdfCanvas, rectangle);
-            canvas.add(new Paragraph(String.valueOf(series.get(0).get(i).getX()))
+            canvas.add(new Paragraph(String.valueOf(series.get(0).getDataSet().get(i).getX()))
                     .setTextAlignment(TextAlignment.CENTER)
                     .setFontColor(chartColors.getScaleColor())
                             .setFontSize(9)
@@ -299,7 +299,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     private void drawBars() {
         float x = barStartPoint;
 //        if(isSingleDataSet()) {
-            for (Data d : series.get(0)) {
+            for (Data d : series.get(0).getDataSet()) {
                 pdfCanvas.setStrokeColor(getStrokeColor());
                 Rectangle rectangle = new Rectangle(x, yStart, barWidth, calculateBarHeight(convertToFloat(d.getY())));
                 pdfCanvas.rectangle(rectangle).setFillColor(chartColors.nextBarColor()).fillStroke();
@@ -412,11 +412,12 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
      */
     private float[] getMinMaxStats() {
         // starts them in the correct range
-        float maxSize = convertToFloat(series.get(0).get(0).getY()), minSize = convertToFloat(series.get(0).get(0).getY());
+//        float maxSize = convertToFloat(series.get(0).get(0).getY()), minSize = convertToFloat(series.get(0).get(0).getY());
+        float maxSize = convertToFloat(series.get(0).getDataSet().get(0).getY()), minSize = convertToFloat(series.get(0).getDataSet().get(0).getY());
         float[] result = new float[2];
         int i;
         for(i = 0; i < series.size(); i++){
-            for (Data d : series.get(i)) {
+            for (Data d : series.get(i).getDataSet()) {
                 float number = convertToFloat(d.getY());
                 if (number > maxSize)
                     maxSize = number;
@@ -552,12 +553,12 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     }
 
 
-    @Override
-    public List<ArrayList<Data<X, Y>>> getSeries() {
-        return series;
-    }
+//    @Override
+//    public ArrayList<DataSet<X, Y>> getSeries() {
+//        return series;
+//    }
 
-    public void setSeries(ArrayList<ArrayList<Data<X, Y>>> series) {
+    public void setSeries(ArrayList<DataSet<X, Y>> series) {
         this.series = series;
     }
 
