@@ -138,7 +138,8 @@ public abstract class XYChart<X, Y> {
 
         private String name = "";
 
-        public DataSet() {
+        public DataSet(String name) {
+            this.name = name;
         }
 
         public void add(BarChart.Data<X,Y> data) {
@@ -159,6 +160,14 @@ public abstract class XYChart<X, Y> {
 
         public ArrayList<Data<X, Y>> getDataSet() {
             return dataSet;
+        }
+
+        public void remove(int element) {
+            dataSet.remove(element);
+        }
+
+        public void clear() {
+            dataSet.clear();
         }
 
     }
@@ -182,7 +191,7 @@ public abstract class XYChart<X, Y> {
 
         private void checkDataSize(int dataSize, DataSet arg) throws DataIntegrityException {
             if(dataSize != arg.size())
-                throw new DataIntegrityException("Data Set " + arg.getClass().getName() + " does not match in size to other datasets");
+                throw new DataIntegrityException("Data Set " + arg.getName() + " does not match in size to other datasets in the series");
         }
 
 

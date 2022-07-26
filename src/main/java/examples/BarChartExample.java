@@ -41,7 +41,7 @@ public class BarChartExample {
         // Create the bar chart
         BarChart<String,Number> chart1 = new BarChart<>(page);
         // Create a data set for the chart
-        XYChart.DataSet dataSet1 = new XYChart.DataSet();
+        XYChart.DataSet dataSet1 = new XYChart.DataSet("New Members");
         // Create a series to hold 1 or more data sets
         XYChart.Series series1 = new XYChart.Series();
         // Put data into the data set
@@ -72,8 +72,8 @@ public class BarChartExample {
         float[] chart2Yaxis1 = { 101, 123, 78, 234, 102 };
         float[] chart2Yaxis2 = { 121, 143, 98, 250, 118 };
         BarChart<String,Number> chart2 = new BarChart<>(page);
-        XYChart.DataSet chart2DataSet1 = new XYChart.DataSet();
-        XYChart.DataSet chart2DataSet2 = new XYChart.DataSet();
+        XYChart.DataSet chart2DataSet1 = new XYChart.DataSet("2001");
+        XYChart.DataSet chart2DataSet2 = new XYChart.DataSet("2002");
         XYChart.Series chart2Series = new XYChart.Series();
         for(int i = 0; i < chart2Xaxis1.length; i++) {
             chart2DataSet1.add(new BarChart.Data<String, Number>(chart2Xaxis1[i], chart2Yaxis1[i]));
@@ -103,7 +103,7 @@ public class BarChartExample {
         String[] xaxis2 = { "Time", "People", "Newsweek" };
         float[] yaxis2 = { 803, 852, 892};
         BarChart<String,Number> chart3 = new BarChart(page);
-        XYChart.DataSet dataSet3 = new XYChart.DataSet();
+        XYChart.DataSet dataSet3 = new XYChart.DataSet("Magazines");
         XYChart.Series series3 = new XYChart.Series();
         for(int i = 0; i < xaxis2.length; i++)
             dataSet3.add(new BarChart.Data<String, Number> (xaxis2[i],yaxis2[i]));
