@@ -69,8 +69,8 @@ public class BarChartExample {
 
         String[] chart2Xaxis1 = { "Guppy", "Goldfish", "Oscar", "Swordfish", "Shark" };
         String[] chart2Xaxis2 = { "Guppy", "Goldfish", "Oscar", "Swordfish", "Shark" };
-        float[] chart2Yaxis1 = { 101, 123, 78, 234, 102 };
-        float[] chart2Yaxis2 = { 121, 143, 98, 250, 118 };
+        float[] chart2Yaxis1 = { 101, 123, 78, 234, 100 };
+        float[] chart2Yaxis2 = { 121, 143, 98, 250, 120 };
         BarChart<String,Number> chart2 = new BarChart<>(page);
         XYChart.DataSet chart2DataSet1 = new XYChart.DataSet("2001");
         XYChart.DataSet chart2DataSet2 = new XYChart.DataSet("2002");
