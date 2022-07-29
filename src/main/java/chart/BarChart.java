@@ -74,7 +74,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         drawBackground();
 //        printNumScaleValues();
         drawGridLines();
-        drawCatagoryScale();
+//        drawCatagoryScale();
         drawValueScale();
         setTitle();
 //        printValues();
@@ -389,7 +389,11 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
      * @return
      */
     private float getNumberOfBars() {
-        return series.get(0).size();
+        float numberOfBars = 0;
+        for(DataSet ds: series) {
+            numberOfBars += ds.size();
+        }
+        return numberOfBars;
     }
 
     /**
