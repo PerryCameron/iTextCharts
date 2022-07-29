@@ -298,6 +298,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
      */
     private void drawBars() {
         float x = barStartPoint;
+        System.out.println("barStartPoint=" + barStartPoint);
         // iterate though all data sets
         for(int i = 0; i < series.size(); i++) {
             // iterate through current data set
@@ -305,14 +306,29 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
                 pdfCanvas.setStrokeColor(getStrokeColor());
                 Rectangle rectangle = new Rectangle(x, yStart, barWidth, calculateBarHeight(convertToFloat(d.getY())));
                 pdfCanvas.rectangle(rectangle).setFillColor(chartColors.nextBarColor()).fillStroke();
-                x = x + barWidth + spacerWidth;
+                x = getNewXStart(x);
             }
-        if(!singleDataSet) chartColors.forceNextColor();
+        // set new start point for next series
+            if(!singleDataSet) {
+                x = (barStartPoint + barWidth + spacerWidth) * (i + 1);
+                System.out.println("x= " + x);
+                chartColors.forceNextColor();
+            }
         }
-//        }
         // resets the palette for the next chart
         getChartColors().setToFirstColor();
     }
+
+    /**
+     * Determinmes the starting location for the next bar
+     * @param x
+     * @return
+     */
+    private float getNewXStart(float x) {
+        x = x + (barWidth + spacerWidth) * series.size();
+        return x;
+    }
+
 
     /**
      * Sets the background color. Default is white
