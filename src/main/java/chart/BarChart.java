@@ -43,8 +43,6 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     private boolean singleDataSet = false;
     // standard margin sizes Microsoft Word uses
     private float pageMarginWidthSizeRatio = 0.15095f;
-    // x-coordinate that the bars start on
-    private float barStartPoint;
     // canvas object
     private final PdfCanvas pdfCanvas;
     // width of each bar
@@ -60,6 +58,8 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
 
     private float titleFontSize = 20;
 
+    private float [][]barPoints;
+
     public BarChart(PdfPage page) {
         this.pdfCanvas = new PdfCanvas(page);
     }
@@ -74,7 +74,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         drawBackground();
         printNumScaleValues();
         drawGridLines();
-//        drawCatagoryScale();
+        drawCatagoryScale();
         drawValueScale();
         setTitle();
         printValues();
@@ -103,7 +103,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         getTicSpacing();
         getGridLineDistance();
         calculateBarSize();
-        calculateBarStartPoint();
+        calculateBarStartPoints();
     }
 
     /**
@@ -128,7 +128,6 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         System.out.println("xStart: " + xStart);
         System.out.println("yStart: " + yStart);
         System.out.println("gridLineDistance: " + gridLineDistance);
-        System.out.println("Bar start point= " + barStartPoint);
         System.out.println(("pageMarginWidthSizeRatio: " + pageMarginWidthSizeRatio));
         System.out.println("BarWidth " + barWidth);
         System.out.println("SpacerWidth= " + spacerWidth);
@@ -187,15 +186,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         this.pdfPageWidth = thisPage.getWidth();
     }
 
-    /**
-     * Calculates where to start drawing bars
-     */
-    private void calculateBarStartPoint() {
-        float bWidth = getNumberOfBars() * barWidth;
-        float sWidth = (getNumberOfBars() - 1) * spacerWidth;
-        float total = bWidth + sWidth;
-        barStartPoint = xStart + yScaleOffset() + ((chartWidth - yScaleOffset() - total) * 0.5f);
-    }
+
 
     /**
      * Draws the X scale, calls setXScaleMiniTics() method as well as setXScaleLabels()
@@ -204,41 +195,41 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         if(showXScale) {
             pdfCanvas.setStrokeColor(chartColors.getScaleColor());
             drawLine(xStart, yStart,xStart + chartWidth, yStart);
-            drawCatagoryScaleMiniTics();
-            drawCatagoryScaleLabels();
+//            drawCatagoryScaleMiniTics();
+//            drawCatagoryScaleLabels();
         }
     }
 
-    private void drawCatagoryScaleMiniTics() {
-        float startPoint = barStartPoint + (barWidth * 0.5f);
-        for(int i = 0; i < getNumberOfBars(); i++) {
-            pdfCanvas.setStrokeColor(chartColors.getScaleColor());
-            pdfCanvas.moveTo(startPoint, yStart);
-            pdfCanvas.lineTo(startPoint, yStart - (chartHeight * 0.02f));
-            pdfCanvas.closePathStroke();
-            startPoint = startPoint + barWidth + spacerWidth;
-        }
-    }
+//    private void drawCatagoryScaleMiniTics() {
+//        float startPoint = barStartPoint + (barWidth * 0.5f);
+//        for(int i = 0; i < getNumberOfBars(); i++) {
+//            pdfCanvas.setStrokeColor(chartColors.getScaleColor());
+//            pdfCanvas.moveTo(startPoint, yStart);
+//            pdfCanvas.lineTo(startPoint, yStart - (chartHeight * 0.02f));
+//            pdfCanvas.closePathStroke();
+//            startPoint = startPoint + barWidth + spacerWidth;
+//        }
+//    }
 
-    private void drawCatagoryScaleLabels() {
-            float rectangleWidth = 24;
-            float rectangleHeight = 80;
-            float xAxisStartPoint = (barStartPoint + (barWidth * 0.5f)) - (rectangleWidth * 0.5f) + 1;
-            float yAxisStartPoint = yStart - rectangleHeight -(chartHeight * 0.035f);
-        for(int i = 0; i < getNumberOfBars(); i++) {
-            Rectangle rectangle = new Rectangle(xAxisStartPoint, yAxisStartPoint, rectangleWidth, rectangleHeight);
-//            pdfCanvas.rectangle(rectangle);
-//            pdfCanvas.stroke();
-            Canvas canvas = new Canvas(pdfCanvas, rectangle);
-            canvas.add(new Paragraph(String.valueOf(series.get(0).getDataSet().get(i).getX()))
-                    .setTextAlignment(TextAlignment.CENTER)
-                    .setFontColor(chartColors.getScaleColor())
-                            .setFontSize(9)
-                    .setRotationAngle(4.71));
-            canvas.close();
-            xAxisStartPoint = xAxisStartPoint + barWidth + spacerWidth;
-        }
-    }
+//    private void drawCatagoryScaleLabels() {
+//            float rectangleWidth = 24;
+//            float rectangleHeight = 80;
+//            float xAxisStartPoint = (barStartPoint + (barWidth * 0.5f)) - (rectangleWidth * 0.5f) + 1;
+//            float yAxisStartPoint = yStart - rectangleHeight -(chartHeight * 0.035f);
+//        for(int i = 0; i < getNumberOfBars(); i++) {
+//            Rectangle rectangle = new Rectangle(xAxisStartPoint, yAxisStartPoint, rectangleWidth, rectangleHeight);
+////            pdfCanvas.rectangle(rectangle);
+////            pdfCanvas.stroke();
+//            Canvas canvas = new Canvas(pdfCanvas, rectangle);
+//            canvas.add(new Paragraph(String.valueOf(series.get(0).getDataSet().get(i).getX()))
+//                    .setTextAlignment(TextAlignment.CENTER)
+//                    .setFontColor(chartColors.getScaleColor())
+//                            .setFontSize(9)
+//                    .setRotationAngle(4.71));
+//            canvas.close();
+//            xAxisStartPoint = xAxisStartPoint + barWidth + spacerWidth;
+//        }
+//    }
 
     private void drawValueScale() {
         if(showYScale) {
@@ -299,24 +290,60 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     /**
      * Draws bars on the chart
      */
-    private void drawBars() {
-        float x = barStartPoint;
+    private void calculateBarStartPoints() {
+        System.out.println("Calculating bar starting points for " + title);
+        // array to hold points where each bar will start
+        barPoints = new float[series.size()][series.get(0).size()];
+        // point bar will start
+//        float x = barStartPoint;
+        float x = 0;
         // iterate though all data sets
         for(int i = 0; i < series.size(); i++) {
+            // iterate though current data set
             for(int j = 0; j < series.get(i).size(); j++) {
-                pdfCanvas.setStrokeColor(getStrokeColor());
-                Rectangle rectangle = new Rectangle(x, yStart, barWidth, calculateBarHeight(convertToFloat(series.get(i).get(j).getY())));
-                pdfCanvas.rectangle(rectangle).setFillColor(chartColors.nextBarColor()).fillStroke();
+                // capture the value of starting point
+                barPoints[i][j] = x;
+
                 x = getNewXStart(x);
+                System.out.print("(" + i + ")(" + j + ")=" + barPoints[i][j] +" ");
             }
+            System.out.println();
         // set new start point for next series
-            if(!singleDataSet) {
-                x = barStartPoint +  ((i + 1) * barWidth);
-                chartColors.forceNextColor();
-            }
+            if(!singleDataSet) x = (i + 1) * barWidth;
         }
-        // resets the palette for the next chart
-        getChartColors().setToFirstColor();
+    }
+
+    private void drawBars() {
+        float offset = calculateOffset();
+        System.out.println("last number is=" + offset);
+        for(int i = 0; i < series.size(); i++) {
+            // iterate though current data set
+            for (int j = 0; j < series.get(i).size(); j++) {
+                // capture the value of starting point
+                pdfCanvas.setStrokeColor(getStrokeColor());
+                Rectangle rectangle = new Rectangle(barPoints[i][j] + offset, yStart, barWidth, calculateBarHeight(convertToFloat(series.get(i).get(j).getY())));
+                pdfCanvas.rectangle(rectangle).setFillColor(chartColors.nextBarColor()).fillStroke();
+            }
+            chartColors.forceNextColor();
+        }
+        chartColors.setToFirstColor();
+    }
+
+    /**
+     * This calculation added to the values in barPoints determines exactly
+     * where to place each bar
+     * @return
+     */
+    private float calculateOffset() {
+        int row = barPoints.length;
+        int col = barPoints[0].length;
+        // first get the last number in barPoints array
+        // Next add the width of 1 bar to that number, which gives the size of them all put together
+        float barArrayWidth = barPoints[row -1][col -1] + barWidth;
+        // finally, calculate the offset using the starting point, the chart width, and the yScaleOffset
+        // which is the width of the y scale
+        float barOffset = xStart + yScaleOffset() + ((chartWidth - yScaleOffset() - barArrayWidth) / 2);
+        return barOffset;
     }
 
     /**
@@ -328,7 +355,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         if(series.size() == 1)
         x = x + (barWidth + spacerWidth);
         else {
-            x = x + (barWidth * series.size()) + (spacerWidth * ((series.size() * 1.1f)));
+            x = x + (barWidth * series.size()) + (spacerWidth * series.size());
         }
         return x;
     }
