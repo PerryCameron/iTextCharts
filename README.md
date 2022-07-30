@@ -9,5 +9,5 @@ and horizontal orientations. The end goal is to have clean looking charts with s
 
 ## BAR Chart
 <p>
-    <img src="https://github.com/PerryCameron/iTextCharts/blob/main/src/main/resources/screenshots/BarChartScreenShot.png"  />
+    <img src="https://github.com/PerryCameron/iTextCharts/blob/main/src/main/resources/screenshots/BarChartScreenShot1.png"  />
 </p>

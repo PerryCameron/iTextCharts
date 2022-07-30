@@ -138,6 +138,11 @@ public abstract class XYChart<X, Y> {
 
         private String name = "";
 
+        /**
+         * represents the element in the color list that matches
+         */
+        private int color = 0;
+
         public DataSet(String name) {
             this.name = name;
         }
@@ -174,6 +179,13 @@ public abstract class XYChart<X, Y> {
             return dataSet.get(element);
         }
 
+        public int getColor() {
+            return color;
+        }
+
+        public void setColor(int color) {
+            this.color = color;
+        }
     }
 
     public final static class Series<X,Y> extends ArrayList<DataSet<X, Y>> {

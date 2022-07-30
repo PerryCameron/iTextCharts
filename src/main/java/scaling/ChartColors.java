@@ -112,8 +112,6 @@ public class ChartColors {
         multiColored = false;
     }
 
-
-
     public void addColor(DeviceCmyk color) {
         barColorPalette.add(color);
         setColorChoice();
@@ -163,5 +161,8 @@ public class ChartColors {
         return borderColor;
     }
 
+    public int getColorSelected() {
+        return colorSelected;
+    }
 
 }

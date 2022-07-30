@@ -9,7 +9,6 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.properties.TextAlignment;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class BarChart<X, Y> extends XYChart<X,Y> {
 
@@ -38,6 +37,8 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     private boolean showBorder = false;
     // shows y scale
     private boolean showYScale = true;
+    // show legend
+    private boolean showLegend = false;
     // shows x scale
     private boolean showXScale = true;
     // do we have only one data set in our series?
@@ -61,7 +62,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
 
     private float [][]barPoints;
 
-    private float []catagoryMiniTics;
+    private float [] categoryMiniTics;
 
     public BarChart(PdfPage page) {
         this.pdfCanvas = new PdfCanvas(page);
@@ -77,7 +78,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         drawBackground();
         printNumScaleValues();
         drawGridLines();
-        drawCatagoryScale();
+        drawCategoryScale();
         drawValueScale();
         setTitle();
         printValues();
@@ -194,7 +195,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     /**
      * Draws the X scale, calls setXScaleMiniTics() method as well as setXScaleLabels()
      */
-    private void drawCatagoryScale() {
+    private void drawCategoryScale() {
         if(showXScale) {
             pdfCanvas.setStrokeColor(chartColors.getScaleColor());
             drawLine(xStart, yStart,xStart + chartWidth, yStart);
@@ -205,10 +206,10 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     }
 
     private void drawCategoryScaleMiniTics() {
-        for(int i = 0; i < catagoryMiniTics.length; i++) {
+        for(int i = 0; i < categoryMiniTics.length; i++) {
             pdfCanvas.setStrokeColor(chartColors.getScaleColor());
-            pdfCanvas.moveTo(catagoryMiniTics[i], yStart);
-            pdfCanvas.lineTo(catagoryMiniTics[i], yStart - (chartHeight * 0.02f));
+            pdfCanvas.moveTo(categoryMiniTics[i], yStart);
+            pdfCanvas.lineTo(categoryMiniTics[i], yStart - (chartHeight * 0.02f));
             pdfCanvas.closePathStroke();
         }
     }
@@ -216,18 +217,20 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     private void calculateMiniTicLocation() {
         float offset = calculateOffset();
         // create a new float array of the length of our data
-        catagoryMiniTics = new float[barPoints[0].length];
+        categoryMiniTics = new float[barPoints[0].length];
+        // gets the halfway point for the bar or group of bars we intend to label
         float halfBarWidth = (barWidth * barPoints.length) / 2;
+        // adds offset and halfway point
         for(int i = 0; i < barPoints[0].length; i++)
-            catagoryMiniTics[i] = barPoints[0][i] + halfBarWidth + offset;
+            categoryMiniTics[i] = barPoints[0][i] + halfBarWidth + offset;
     }
 
     private void drawCategoryScaleLabels() {
             float rectangleWidth = 24;
             float rectangleHeight = 80;
             float yAxisStartPoint = yStart - rectangleHeight -(chartHeight * 0.035f);
-        for(int i = 0; i < catagoryMiniTics.length; i++) {
-            Rectangle rectangle = new Rectangle(catagoryMiniTics[i] -11, yAxisStartPoint, rectangleWidth, rectangleHeight);
+        for(int i = 0; i < categoryMiniTics.length; i++) {
+            Rectangle rectangle = new Rectangle(categoryMiniTics[i] -11, yAxisStartPoint, rectangleWidth, rectangleHeight);
 //            pdfCanvas.rectangle(rectangle);
 //            pdfCanvas.stroke();
             Canvas canvas = new Canvas(pdfCanvas, rectangle);
@@ -329,10 +332,15 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
                 Rectangle rectangle = new Rectangle(barPoints[i][j] + offset, yStart, barWidth, calculateBarHeight(convertToFloat(series.get(i).get(j).getY())));
                 pdfCanvas.rectangle(rectangle).setFillColor(chartColors.nextBarColor()).fillStroke();
             }
+            // will match the color for the legend
+            series.get(i).setColor(chartColors.getColorSelected());
             chartColors.forceNextColor();
         }
         chartColors.setToFirstColor();
-        System.out.println("barpoints=" + Arrays.toString(barPoints[0]));
+    }
+
+    private void drawLegend() {
+
     }
 
     /**
@@ -377,6 +385,10 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         pdfCanvas.rectangle(rectangle).setFillColor(chartColors.getBackgroundColor()).fillStroke();
     }
 
+    /**
+     * The space needed for the value scale
+     * @return
+     */
     private float yScaleOffset() {
         return (chartWidth * ((1 - BAR_CHART_RATIO) / 2));
     }
