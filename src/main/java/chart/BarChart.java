@@ -72,12 +72,12 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     public void stroke() {
         setVariables();
         drawBackground();
-//        printNumScaleValues();
+        printNumScaleValues();
         drawGridLines();
 //        drawCatagoryScale();
         drawValueScale();
         setTitle();
-//        printValues();
+        printValues();
         drawBars();
         drawFrame();
     }
@@ -248,6 +248,9 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         }
     }
 
+    /**
+     * Draws the short ticks along the value scale
+     */
     private void drawValueScaleMiniTics() {
         float xAxisStartPoint = xStart + yScaleOffset();
         float miniTicSize = gridLineDistance / 5;
@@ -298,20 +301,17 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
      */
     private void drawBars() {
         float x = barStartPoint;
-        System.out.println("barStartPoint=" + barStartPoint);
         // iterate though all data sets
         for(int i = 0; i < series.size(); i++) {
-            // iterate through current data set
-            for (Data d : series.get(i).getDataSet()) {
+            for(int j = 0; j < series.get(i).size(); j++) {
                 pdfCanvas.setStrokeColor(getStrokeColor());
-                Rectangle rectangle = new Rectangle(x, yStart, barWidth, calculateBarHeight(convertToFloat(d.getY())));
+                Rectangle rectangle = new Rectangle(x, yStart, barWidth, calculateBarHeight(convertToFloat(series.get(i).get(j).getY())));
                 pdfCanvas.rectangle(rectangle).setFillColor(chartColors.nextBarColor()).fillStroke();
                 x = getNewXStart(x);
             }
         // set new start point for next series
             if(!singleDataSet) {
-                x = (barStartPoint + barWidth + spacerWidth) * (i + 1);
-                System.out.println("x= " + x);
+                x = barStartPoint +  ((i + 1) * barWidth);
                 chartColors.forceNextColor();
             }
         }
@@ -325,7 +325,11 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
      * @return
      */
     private float getNewXStart(float x) {
-        x = x + (barWidth + spacerWidth) * series.size();
+        if(series.size() == 1)
+        x = x + (barWidth + spacerWidth);
+        else {
+            x = x + (barWidth * series.size()) + (spacerWidth * ((series.size() * 1.1f)));
+        }
         return x;
     }
 

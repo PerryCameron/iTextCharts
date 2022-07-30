@@ -220,7 +220,6 @@ public abstract class XYChart<X, Y> {
                 if(!(this.get(0).get(i).getX().equals(d.get(i).getX())))
                     throw new DataIntegrityException("Data Set " + d.getName() + " categories do not match data set "
                         + this.get(0).getName() + " in this series");
-                else System.out.println("match");
             }
         }
 
