@@ -32,6 +32,7 @@ public class BarChartExample {
         // Initialize PDF document
         PdfDocument pdf = new PdfDocument(writer);
         PdfPage page = pdf.addNewPage();
+        Document document = new Document(pdf);
 
         // Some test data
         String[] xaxis = { "2002", "2003", "2004", "2005", "2006", "2007","2008", "2009", "2010", "2011",
@@ -172,7 +173,7 @@ public class BarChartExample {
         System.out.println("multi-colored=" + chart4.getChartColors().isMultiColored());
 
 
-        Document document = new Document(pdf);
+
         document.close();
         File file = new File(dest);
         Desktop desktop = Desktop.getDesktop(); // Gui_Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()

@@ -78,6 +78,10 @@ public class ChartColors {
         return color;
     }
 
+    public DeviceCmyk getColorByElement(int element) {
+        return barColorPalette.get(element);
+    }
+
     public void forceNextColor() {
         colorSelected++;
         if (colorSelected == barColorPalette.size() - 1)
@@ -164,5 +168,7 @@ public class ChartColors {
     public int getColorSelected() {
         return colorSelected;
     }
+
+
 
 }

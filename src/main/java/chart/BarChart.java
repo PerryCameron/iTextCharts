@@ -1,6 +1,8 @@
 package chart;
 
 import com.itextpdf.kernel.colors.DeviceCmyk;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
@@ -8,6 +10,7 @@ import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.properties.TextAlignment;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class BarChart<X, Y> extends XYChart<X,Y> {
@@ -64,6 +67,9 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
 
     private float [] categoryMiniTics;
 
+    PdfFont font;
+
+
     public BarChart(PdfPage page) {
         this.pdfCanvas = new PdfCanvas(page);
     }
@@ -84,14 +90,27 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         printValues();
         drawBars();
         drawFrame();
+        drawLegend();
     }
 
     /**
-     *  When stroke() is called on chart this method calculates values needed to create the chart
+     *  When stroke() is called on chart this method collects or calculates values needed to create the chart
      */
     private void setVariables() {
         getPDFSize();
-        System.out.println("series size= " + series.size());
+        setFont();
+
+        setNumberOfDataSets();
+        setChartWidth();
+        getXStart();
+        getYStart();
+        getTicSpacing();
+        getGridLineDistance();
+        calculateBarSize();
+        calculateBarStartPoints();
+    }
+
+    private void setNumberOfDataSets() {
         // if there is only one element in our series array this is a single series chart
         if(series.size() == SINGLE_DATA_SET) {
             singleDataSet = true;
@@ -100,14 +119,14 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         } else {
             getChartColors().setMultiColoredBars(false);
         }
-        if (chartWidth == 0) setChartWidth();
-        if (xStart == 0) getXStart();
-        if (yStart == 0) getYStart();
+    }
 
-        getTicSpacing();
-        getGridLineDistance();
-        calculateBarSize();
-        calculateBarStartPoints();
+    private void setFont() {
+        try {
+            this.font = PdfFontFactory.createRegisteredFont("helvetica");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -164,6 +183,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
      * before calling stroke()
      */
     private void setChartWidth() {
+        if(chartWidth == 0)
         chartWidth = pdfPageWidth - (pdfPageWidth * pageMarginWidthSizeRatio) * 2;
     }
 
@@ -171,14 +191,16 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
      * Creates a default x starting point for bottom-left corner of chart if it is not specified before calling stroke()
      */
     private void getXStart() {
-        xStart = pdfPageWidth * pageMarginWidthSizeRatio;
+        if (xStart == 0)
+            xStart = pdfPageWidth * pageMarginWidthSizeRatio;
     }
 
     /**
      * Creates a default y starting point for bottom-left corner of chart if it is not specified before calling stroke()
      */
     private void getYStart() {
-        yStart = pdfPageHeight - chartHeight - (pdfPageHeight * 0.15f);
+        if (yStart == 0)
+            yStart = pdfPageHeight - chartHeight - (pdfPageHeight * 0.15f);
     }
 
     /**
@@ -234,14 +256,29 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
 //            pdfCanvas.rectangle(rectangle);
 //            pdfCanvas.stroke();
             Canvas canvas = new Canvas(pdfCanvas, rectangle);
-            canvas.add(new Paragraph(String.valueOf(series.get(0).getDataSet().get(i).getX()))
-                    .setTextAlignment(TextAlignment.CENTER)
-                    .setFontColor(chartColors.getScaleColor())
-                            .setFontSize(9)
-                    .setRotationAngle(4.71));
+            // gets the length of the string
+            float stringLength = getStringLength(String.valueOf(series.get(0).getDataSet().get(i).getX()));
+               Paragraph paragraph = new Paragraph(String.valueOf(series.get(0).getDataSet().get(i).getX()))
+                       .setTextAlignment(TextAlignment.CENTER)
+                       .setFontColor(chartColors.getScaleColor())
+                       .setFontSize(9)
+                       .setFont(font)
+                       .setRotationAngle(4.71);
+               System.out.println("The width of " + String.valueOf(series.get(0).getDataSet().get(i).getX()) + " is " + stringLength);
+            canvas.add(paragraph);
             canvas.close();
         }
     }
+
+    private float getStringLength(String string) {
+        char[] stringArray = string.toCharArray();
+        float length = 0;
+        for(char c: stringArray) {
+        length += font.getWidth(c,12);
+        }
+        return length;
+    }
+
 
     private void drawValueScale() {
         if(showYScale) {
@@ -280,12 +317,18 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         for (int i = 0; i < numTics + 1; i++) {
             Rectangle rectangle = new Rectangle(xStart -54, ycordinate, 50, 24);
             Canvas canvas = new Canvas(pdfCanvas, rectangle);
-            canvas.add(new Paragraph(String.valueOf(increment))
+            // gets length of string
+            float stringLength = getStringLength(String.valueOf(increment));
+            Paragraph paragraph = new Paragraph(String.valueOf(increment))
                     .setTextAlignment(TextAlignment.RIGHT)
-                    .setFontColor(chartColors.getScaleColor()));
+                    .setFont(font)
+                    .setFontColor(chartColors.getScaleColor());
+            canvas.add(paragraph);
             canvas.close();
+            System.out.println("The width of " + String.valueOf(increment) + " is " + stringLength);
             increment += chartScale.getTickSpacing();
             ycordinate += gridLineDistance;
+
         }
     }
 
@@ -340,7 +383,23 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     }
 
     private void drawLegend() {
+        float legendIconSize = getIconSize();
+        float y = yStart;
+        for(DataSet ds: series) {
+            pdfCanvas.setStrokeColor(getStrokeColor());
+            Rectangle rectangle = new Rectangle(13, y, legendIconSize, legendIconSize);
+            pdfCanvas.rectangle(rectangle).setFillColor(chartColors.getColorByElement(ds.getColor())).fillStroke();
+            y += 20;
+        }
+    }
 
+    private float getIconSize() {
+        float size = 0;
+        if(barWidth > 12)
+            size = 12;
+        else
+            size = barWidth;
+        return size;
     }
 
     /**
