@@ -96,7 +96,7 @@ public class BarChartExample {
         chart2.setOutLineBars(true);
         chart2.setVerticalStart(250);
         chart2.setTitleFontSize(15);
-        chart2.setTitle("Types Of Fish Bought In 2022");
+        chart2.setTitle("Types Of Fish Bought");
         System.out.println("________________________________________________________");
 
         System.out.println("chart2.stroke();");

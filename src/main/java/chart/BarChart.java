@@ -9,17 +9,16 @@ import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.VerticalAlignment;
 
 import java.io.IOException;
+import java.sql.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class BarChart<X, Y> extends XYChart<X,Y> {
 
-    // will be obsolete
-//    private List<BarChart.Data<X,Y>> data;
     private ArrayList<DataSet<X, Y>> series;
-
-
     // this is the height given for the chart, does not include legend or numbers (200 default)
     private float chartHeight = 200;
     // entire width of the chart
@@ -60,14 +59,18 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     private float pdfPageHeight;
     // title
     private String title = "Title";
-
+    // font size for title
     private float titleFontSize = 20;
-
+    // all points for start of bars starting at 0, must still add offset for correct location
     private float [][]barPoints;
+    // all points for start of category mini tics
+    private float []categoryMiniTics;
+    // font used for entire chart
+    private float []legendPoints;
+    private PdfFont font;
 
-    private float [] categoryMiniTics;
-
-    PdfFont font;
+    private float largestCategoryStringSize;
+    private float largestValueStringSize;
 
 
     public BarChart(PdfPage page) {
@@ -154,6 +157,8 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         System.out.println(("pageMarginWidthSizeRatio: " + pageMarginWidthSizeRatio));
         System.out.println("BarWidth " + barWidth);
         System.out.println("SpacerWidth= " + spacerWidth);
+        System.out.println("largestCategoryStringSize=" + largestCategoryStringSize);
+        System.out.println("largestValueStringSize=" + largestValueStringSize);
     }
 
     private void printNumScaleValues() {
@@ -256,25 +261,45 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
 //            pdfCanvas.rectangle(rectangle);
 //            pdfCanvas.stroke();
             Canvas canvas = new Canvas(pdfCanvas, rectangle);
-            // gets the length of the string
-            float stringLength = getStringLength(String.valueOf(series.get(0).getDataSet().get(i).getX()));
+            // sets the longest category string length for placing the legend
+            setLargestCategoryStringSize(String.valueOf(series.get(0).getDataSet().get(i).getX()));
                Paragraph paragraph = new Paragraph(String.valueOf(series.get(0).getDataSet().get(i).getX()))
                        .setTextAlignment(TextAlignment.CENTER)
                        .setFontColor(chartColors.getScaleColor())
                        .setFontSize(9)
                        .setFont(font)
                        .setRotationAngle(4.71);
-               System.out.println("The width of " + String.valueOf(series.get(0).getDataSet().get(i).getX()) + " is " + stringLength);
             canvas.add(paragraph);
             canvas.close();
         }
     }
 
+    private void setLargestCategoryStringSize(String string) {
+        float stringLength = getStringLength(string);
+        if(stringLength > largestCategoryStringSize)
+            this.largestCategoryStringSize = stringLength;
+    }
+
+    /**
+     * increases value if new value is larger
+     * @param string
+     */
+    public void setLargestValueStringSize(String string) {
+        float stringLength = getStringLength(string);
+        if(stringLength > largestValueStringSize)
+        this.largestValueStringSize = stringLength;
+    }
+
+    /**
+     * inputs a string and outputs the amount of space it takes
+     * @param string
+     * @return
+     */
     private float getStringLength(String string) {
         char[] stringArray = string.toCharArray();
         float length = 0;
         for(char c: stringArray) {
-        length += font.getWidth(c,12);
+        length += font.getWidth(c,12); // TODO make font size changable
         }
         return length;
     }
@@ -317,18 +342,16 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         for (int i = 0; i < numTics + 1; i++) {
             Rectangle rectangle = new Rectangle(xStart -54, ycordinate, 50, 24);
             Canvas canvas = new Canvas(pdfCanvas, rectangle);
-            // gets length of string
-            float stringLength = getStringLength(String.valueOf(increment));
+            // gets largest value size for placement of Y axis label
+            setLargestValueStringSize(String.valueOf(increment));
             Paragraph paragraph = new Paragraph(String.valueOf(increment))
                     .setTextAlignment(TextAlignment.RIGHT)
                     .setFont(font)
                     .setFontColor(chartColors.getScaleColor());
             canvas.add(paragraph);
             canvas.close();
-            System.out.println("The width of " + String.valueOf(increment) + " is " + stringLength);
             increment += chartScale.getTickSpacing();
             ycordinate += gridLineDistance;
-
         }
     }
 
@@ -383,14 +406,51 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     }
 
     private void drawLegend() {
+        float miniTicSize = chartHeight * 0.02f;
+        System.out.println("miniTicSize= " + miniTicSize);
+        float yAxisStartPoint = yStart - largestCategoryStringSize - (miniTicSize *  4) ;
         float legendIconSize = getIconSize();
-        float y = yStart;
-        for(DataSet ds: series) {
+        System.out.println("legendIconSize=" + legendIconSize);
+        calculateDataSetLegendXValue();
+        float chartMiddle = yScaleOffset() + xStart + ((chartWidth -yScaleOffset()) / 2);
+        System.out.println("chart middle=" + chartMiddle);
+        Rectangle rectangle;
+        for(int i = 0; i < series.size(); i++) {
             pdfCanvas.setStrokeColor(getStrokeColor());
-            Rectangle rectangle = new Rectangle(13, y, legendIconSize, legendIconSize);
-            pdfCanvas.rectangle(rectangle).setFillColor(chartColors.getColorByElement(ds.getColor())).fillStroke();
-            y += 20;
+            rectangle = new Rectangle(xStart -60 +legendPoints[i], yAxisStartPoint, legendIconSize, legendIconSize);
+            pdfCanvas.rectangle(rectangle).setFillColor(chartColors.getColorByElement(series.get(i).getColor())).fillStroke();
+                                                                                                                // this is magic here - intuition + trial and error
+            rectangle = new Rectangle(xStart -60 +legendPoints[i] + legendIconSize + 4, yAxisStartPoint -(26 - (legendIconSize) * 0.48f), 60, 40);
+//            pdfCanvas.rectangle(rectangle).stroke();
+            Canvas canvas = new Canvas(pdfCanvas, rectangle);
+            Paragraph paragraph = new Paragraph(series.get(i).getName())
+                    .setTextAlignment(TextAlignment.LEFT)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .setFont(font)
+                    .setFontColor(chartColors.getScaleColor());
+            canvas.add(paragraph);
+            canvas.close();
         }
+    }
+
+
+    // TODO
+    private void calculateDataSetLegendXValue() {
+        float effectiveChartWidth = chartWidth - yScaleOffset();
+        float iconSize = getIconSize();
+        float totalSize = 0;
+        legendPoints = new float[series.size()];
+        for(int i = 0; i < series.size(); i++) {
+            if(i < 1)
+            legendPoints[i] = getStringLength(series.get(i).getName() + iconSize + 4);
+            else
+            legendPoints[i] = legendPoints[i-1] + getStringLength(series.get(i).getName() + iconSize + 4);
+            System.out.println("legendPoints[" + i + "]=" + legendPoints[i]);
+            totalSize += legendPoints[i];
+        }
+        System.out.println(Arrays.asList(legendPoints));
+        System.out.println("Total chart Width" + effectiveChartWidth);
+        System.out.println("Total needed Legend size=" + totalSize);
     }
 
     private float getIconSize() {
