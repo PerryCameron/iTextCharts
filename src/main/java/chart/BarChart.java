@@ -12,7 +12,6 @@ import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.VerticalAlignment;
 
 import java.io.IOException;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -40,7 +39,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     // shows y scale
     private boolean showYScale = true;
     // show legend
-    private boolean showLegend = false;
+    private boolean legendVisible = false;
     // shows x scale
     private boolean showXScale = true;
     // do we have only one data set in our series?
@@ -406,30 +405,32 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     }
 
     private void drawLegend() {
-        float miniTicSize = chartHeight * 0.02f;
-        System.out.println("miniTicSize= " + miniTicSize);
-        float yAxisStartPoint = yStart - largestCategoryStringSize - (miniTicSize *  4) ;
-        float legendIconSize = getIconSize();
-        System.out.println("legendIconSize=" + legendIconSize);
-        calculateDataSetLegendXValue();
-        float chartMiddle = yScaleOffset() + xStart + ((chartWidth -yScaleOffset()) / 2);
-        System.out.println("chart middle=" + chartMiddle);
-        Rectangle rectangle;
-        for(int i = 0; i < series.size(); i++) {
-            pdfCanvas.setStrokeColor(getStrokeColor());
-            rectangle = new Rectangle(xStart -60 +legendPoints[i], yAxisStartPoint, legendIconSize, legendIconSize);
-            pdfCanvas.rectangle(rectangle).setFillColor(chartColors.getColorByElement(series.get(i).getColor())).fillStroke();
-                                                                                                                // this is magic here - intuition + trial and error
-            rectangle = new Rectangle(xStart -60 +legendPoints[i] + legendIconSize + 4, yAxisStartPoint -(26 - (legendIconSize) * 0.48f), 60, 40);
+        if(legendVisible) {
+            float miniTicSize = chartHeight * 0.02f;
+            System.out.println("miniTicSize= " + miniTicSize);
+            float yAxisStartPoint = yStart - largestCategoryStringSize - (miniTicSize * 4);
+            float legendIconSize = getIconSize();
+            System.out.println("legendIconSize=" + legendIconSize);
+            calculateDataSetLegendXValue();
+            float chartMiddle = yScaleOffset() + xStart + ((chartWidth - yScaleOffset()) / 2);
+            System.out.println("chart middle=" + chartMiddle);
+            Rectangle rectangle;
+            for (int i = 0; i < series.size(); i++) {
+                pdfCanvas.setStrokeColor(getStrokeColor());
+                rectangle = new Rectangle(xStart - 60 + legendPoints[i], yAxisStartPoint, legendIconSize, legendIconSize);
+                pdfCanvas.rectangle(rectangle).setFillColor(chartColors.getColorByElement(series.get(i).getColor())).fillStroke();
+                // this is magic here - intuition + trial and error
+                rectangle = new Rectangle(xStart - 60 + legendPoints[i] + legendIconSize + 4, yAxisStartPoint - (26 - (legendIconSize) * 0.48f), 60, 40);
 //            pdfCanvas.rectangle(rectangle).stroke();
-            Canvas canvas = new Canvas(pdfCanvas, rectangle);
-            Paragraph paragraph = new Paragraph(series.get(i).getName())
-                    .setTextAlignment(TextAlignment.LEFT)
-                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                    .setFont(font)
-                    .setFontColor(chartColors.getScaleColor());
-            canvas.add(paragraph);
-            canvas.close();
+                Canvas canvas = new Canvas(pdfCanvas, rectangle);
+                Paragraph paragraph = new Paragraph(series.get(i).getName())
+                        .setTextAlignment(TextAlignment.LEFT)
+                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                        .setFont(font)
+                        .setFontColor(chartColors.getScaleColor());
+                canvas.add(paragraph);
+                canvas.close();
+            }
         }
     }
 
@@ -760,5 +761,13 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
 
     public void setSingleDataSet(boolean singleDataSet) {
         this.singleDataSet = singleDataSet;
+    }
+
+    public boolean isLegendVisible() {
+        return legendVisible;
+    }
+
+    public void setLegendVisible(boolean legendVisible) {
+        this.legendVisible = legendVisible;
     }
 }

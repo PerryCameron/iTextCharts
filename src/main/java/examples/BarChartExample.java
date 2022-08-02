@@ -95,6 +95,7 @@ public class BarChartExample {
         chart2.setShowBorder(true);
         chart2.setOutLineBars(true);
         chart2.setVerticalStart(250);
+        chart2.setLegendVisible(true);
         chart2.setTitleFontSize(15);
         chart2.setTitle("Types Of Fish Bought");
         System.out.println("________________________________________________________");
@@ -105,7 +106,6 @@ public class BarChartExample {
         System.out.println("multi-colored=" + chart2.getChartColors().isMultiColored());
 
 
-//        page = pdf.addNewPage();
         String[] xaxis2 = { "Time", "People", "Newsweek" };
         float[] yaxis2 = { 803, 852, 892};
         BarChart<String,Number> chart3 = new BarChart(page);
@@ -117,7 +117,6 @@ public class BarChartExample {
         chart3.setSeries(series3);
         chart3.getChartColors().resetDefaultColors();
         chart3.getChartColors().setMultiColoredBars(true);
-//        chart3.getChartColors().setBackgroundColor(new DeviceCmyk(.12f, .05f, 0, 0.02f));
         chart3.setChartSize(200,350);
         chart3.setStartPoint(350,120);
         chart3.setTitleFontSize(9);
@@ -125,8 +124,6 @@ public class BarChartExample {
         chart3.getChartColors().setGridLineColor(new DeviceCmyk(0,0.78f,0.78f,0.08f));
         chart3.setShowBorder(true);
         chart3.getChartColors().setBorderColor(new DeviceCmyk(0,0.78f,0.78f,0.08f));
-//        chart3.setShowBorder(true);
-//        chart3.setGridLinesVisable(false);
         System.out.println("________________________________________________________");
         System.out.println("chart3.stroke();");
         chart3.stroke();
@@ -171,9 +168,6 @@ public class BarChartExample {
         chart4.stroke();
         System.out.println("singleDataSet= " + chart4.isSingleDataSet());
         System.out.println("multi-colored=" + chart4.getChartColors().isMultiColored());
-
-
-
         document.close();
         File file = new File(dest);
         Desktop desktop = Desktop.getDesktop(); // Gui_Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()
