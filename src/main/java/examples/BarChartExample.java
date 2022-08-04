@@ -161,6 +161,7 @@ public class BarChartExample {
         chart4.setAutoScale(false);
         chart4.setVerticalStart(550);
         chart4.setTitleFontSize(20);
+        chart4.setLegendVisible(true);
         chart4.getChartColors().setGridLineColor(new DeviceCmyk(64,0,6,3));
         chart4.setTitle("New Members By Year");
         System.out.println("________________________________________________________");
