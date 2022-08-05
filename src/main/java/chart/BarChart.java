@@ -76,6 +76,15 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         this.pdfCanvas = new PdfCanvas(page);
     }
 
+    public BarChart(PdfPage page, float chartHeight, float chartWidth, float xStart, float yStart) {
+        this.pdfCanvas = new PdfCanvas(page);
+        this.chartHeight = chartHeight;
+        this.chartWidth = chartWidth;
+        this.xStart = xStart;
+        this.yStart = yStart;
+    }
+
+
     /**
      * This method is called when you want to draw the chart. All variables you wish to implement must be
      * set before this method is called.
@@ -769,5 +778,45 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
 
     public void setLegendVisible(boolean legendVisible) {
         this.legendVisible = legendVisible;
+    }
+
+
+
+    public static class BarChartBuilder {
+        private PdfPage nestedPage;
+        private float nestedChartHeight;
+        private float nestedChartWidth;
+        private float nestedXStart;
+        private float nestedYStart;
+
+        public BarChartBuilder nestedPage(PdfPage newPage) {
+            this.nestedPage = newPage;
+            return this;
+        }
+
+        public BarChartBuilder nestedChartHeight(float newChartHeight) {
+        this.nestedChartHeight = newChartHeight;
+        return this;
+        }
+
+        public BarChartBuilder nestedChartWidth(float newChartWidth) {
+            this.nestedChartHeight = newChartWidth;
+            return this;
+        }
+
+        public BarChartBuilder nestedXStart(float newXStart) {
+            this.nestedXStart = newXStart;
+            return this;
+        }
+
+        public BarChartBuilder nestedYStart(float newYStart) {
+            this.nestedXStart = newYStart;
+            return this;
+        }
+
+        public BarChart createBarChart() {
+            return new BarChart(nestedPage,nestedChartHeight,nestedChartWidth,nestedXStart,nestedYStart);
+        }
+
     }
 }

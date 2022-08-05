@@ -108,7 +108,13 @@ public class BarChartExample {
 
         String[] xaxis2 = { "Time", "People", "Newsweek" };
         float[] yaxis2 = { 803, 852, 892};
-        BarChart<String,Number> chart3 = new BarChart(page);
+        BarChart<String,Number> chart3 = new BarChart.BarChartBuilder()
+                .nestedPage(page)
+                .nestedChartHeight(350)
+                .nestedChartWidth(200)
+                .nestedXStart(350)
+                .nestedYStart(120)
+                .createBarChart();
         XYChart.DataSet dataSet3 = new XYChart.DataSet("Magazines");
         XYChart.Series series3 = new XYChart.Series();
         for(int i = 0; i < xaxis2.length; i++)
