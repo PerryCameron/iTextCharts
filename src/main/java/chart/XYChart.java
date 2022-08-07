@@ -81,7 +81,7 @@ public abstract class XYChart<X, Y> {
      * @return
      */
 
-    abstract void setGridLinesVisable(boolean gridLinesVisable);
+    abstract void setGridLinesVisible(boolean gridLinesVisible);
 
     public List<ArrayList<Data<X, Y>>> getSeries() {
         return series;

@@ -123,8 +123,8 @@ public class BarChartExample {
         chart3.setSeries(series3);
         chart3.getChartColors().resetDefaultColors();
         chart3.getChartColors().setMultiColoredBars(true);
-        chart3.setChartSize(200,350);
-        chart3.setStartPoint(350,120);
+//        chart3.setChartSize(200,350);
+//        chart3.setStartPoint(350,120);
         chart3.setTitleFontSize(9);
         chart3.setTitle("Magazines Read Over lifetime");
         chart3.getChartColors().setGridLineColor(new DeviceCmyk(0,0.78f,0.78f,0.08f));

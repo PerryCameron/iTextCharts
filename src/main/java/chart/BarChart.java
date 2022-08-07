@@ -13,7 +13,6 @@ import com.itextpdf.layout.properties.VerticalAlignment;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class BarChart<X, Y> extends XYChart<X,Y> {
 
@@ -29,7 +28,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     // distance between gridlines
     private float gridLineDistance;
     // determines if you want gridlines
-    private boolean gridLinesVisable = true;
+    private boolean gridLinesVisible = true;
     // outline bars with a different color
     private boolean outLineBars = false;
     // chart will focus on data-points instead of starting xAxis at 0
@@ -241,10 +240,10 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     }
 
     private void drawCategoryScaleMiniTics() {
-        for(int i = 0; i < categoryMiniTics.length; i++) {
+        for (float categoryMiniTic : categoryMiniTics) {
             pdfCanvas.setStrokeColor(chartColors.getScaleColor());
-            pdfCanvas.moveTo(categoryMiniTics[i], yStart);
-            pdfCanvas.lineTo(categoryMiniTics[i], yStart - (chartHeight * 0.02f));
+            pdfCanvas.moveTo(categoryMiniTic, yStart);
+            pdfCanvas.lineTo(categoryMiniTic, yStart - (chartHeight * 0.02f));
             pdfCanvas.closePathStroke();
         }
     }
@@ -290,7 +289,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
 
     /**
      * increases value if new value is larger
-     * @param string
+     * @param string A string to find the length of
      */
     public void setLargestValueStringSize(String string) {
         float stringLength = getStringLength(string);
@@ -307,7 +306,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         char[] stringArray = string.toCharArray();
         float length = 0;
         for(char c: stringArray) {
-        length += font.getWidth(c,12); // TODO make font size changable
+        length += font.getWidth(c,12); // TODO make font size changeable
         }
         return length;
     }
@@ -346,9 +345,9 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         float numTics = getNumberOfTics();
         if(autoScale)
             increment = (int) chartScale.getNiceMin();
-        float ycordinate = yStart - 12;
+        float yCoordinate = yStart - 12;
         for (int i = 0; i < numTics + 1; i++) {
-            Rectangle rectangle = new Rectangle(xStart -54, ycordinate, 50, 24);
+            Rectangle rectangle = new Rectangle(xStart -54, yCoordinate, 50, 24);
             Canvas canvas = new Canvas(pdfCanvas, rectangle);
             // gets largest value size for placement of Y axis label
             setLargestValueStringSize(String.valueOf(increment));
@@ -359,7 +358,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
             canvas.add(paragraph);
             canvas.close();
             increment += chartScale.getTickSpacing();
-            ycordinate += gridLineDistance;
+            yCoordinate += gridLineDistance;
         }
     }
 
@@ -458,13 +457,12 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
             System.out.println("legendPoints[" + i + "]=" + legendPoints[i]);
             totalSize += legendPoints[i];
         }
-        System.out.println(Arrays.asList(legendPoints));
         System.out.println("Total chart Width" + effectiveChartWidth);
         System.out.println("Total needed Legend size=" + totalSize);
     }
 
     private float getIconSize() {
-        float size = 0;
+        float size;
         if(barWidth > 12)
             size = 12;
         else
@@ -485,12 +483,11 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         float barArrayWidth = barPoints[row -1][col -1] + barWidth;
         // finally, calculate the offset using the starting point, the chart width, and the yScaleOffset
         // which is the width of the y scale
-        float barOffset = xStart + yScaleOffset() + ((chartWidth - yScaleOffset() - barArrayWidth) / 2);
-        return barOffset;
+        return xStart + yScaleOffset() + ((chartWidth - yScaleOffset() - barArrayWidth) / 2);
     }
 
     /**
-     * Determinmes the starting location for the next bar
+     * Determines the starting location for the next bar
      * @param x
      * @return
      */
@@ -553,7 +550,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
 
     /**
      * Calculates the height of a given bar
-     * @param height
+     * @param height original data
      * @return
      */
     private float calculateBarHeight(float height) {
@@ -572,7 +569,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
      * Draws gridlines if enabled
      */
     private void drawGridLines() {
-        if (gridLinesVisable) {
+        if (gridLinesVisible) {
             float scaleHeight = yStart;
             for (int i = 0; i < getNumberOfTics(); i++) {
                 pdfCanvas.setStrokeColor(chartColors.getGridLineColor());
@@ -720,10 +717,10 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
 
     /**
      * When true grid lines are shown in chart
-     * @param gridLinesVisable
+     * @param gridLinesVisible
      */
-    public void setGridLinesVisable(boolean gridLinesVisable) {
-        this.gridLinesVisable = gridLinesVisable;
+    public void setGridLinesVisible(boolean gridLinesVisible) {
+        this.gridLinesVisible = gridLinesVisible;
     }
 
     /**
@@ -800,7 +797,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         }
 
         public BarChartBuilder nestedChartWidth(float newChartWidth) {
-            this.nestedChartHeight = newChartWidth;
+            this.nestedChartWidth = newChartWidth;
             return this;
         }
 
@@ -810,7 +807,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         }
 
         public BarChartBuilder nestedYStart(float newYStart) {
-            this.nestedXStart = newYStart;
+            this.nestedYStart = newYStart;
             return this;
         }
 
