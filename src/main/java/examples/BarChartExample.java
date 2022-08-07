@@ -15,7 +15,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class BarChartExample {
-
+        // TODO bars overlap when not outlined
+        // TODO if legend text is different size the gaps are different
     public static void main(String[] args) {
         // Initialize PDF writer
         PdfWriter writer = null;
@@ -127,6 +128,7 @@ public class BarChartExample {
 //        chart3.setChartSize(200,350);
 //        chart3.setStartPoint(350,120);
         chart3.setTitleFontSize(9);
+        chart3.setLegendVisible(true);
         chart3.setTitle("Magazines Read Over lifetime");
         chart3.getChartColors().setGridLineColor(new DeviceCmyk(0,0.78f,0.78f,0.08f));
         chart3.setShowBorder(true);
@@ -142,29 +144,36 @@ public class BarChartExample {
                 "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022" };
         int[] chart4Yaxis1 = { 21, 19, 18, 15, 13, 27, 17, 19, 20, 15, 24, 17, 21, 18,
                 23, 26, 15, 17, 28, 15, 7};
-        int[] chart4Yaxis2 = { 22, 20, 19, 16, 14, 28, 18, 20, 21, 16, 25, 18, 22, 19,
+        int[] chart4Yaxis2 = { 18, 17, 9, 9, 14, 28, 18, 20, 21, 16, 25, 18, 22, 19,
                 24, 27, 16, 18, 29, 16, 8};
+        int[] chart4Yaxis3 = { 4, 5, 6, 7, 8, 5, 6, 7, 2, 3, 4, 7, 4, 6,
+                7, 5, 6, 7, 8, 6, 2};
+        int[] chart4Yaxis4 = { 2, 3, 4, 5, 6, 2, 3, 4, 1, 2, 3, 2, 3, 4,
+                4, 5, 6, 3, 4, 5, 6};
         // Create the bar chart
         BarChart<String,Number> chart4 = new BarChart<>(pdf.addNewPage());
         // Create a data set for the chart
-        XYChart.DataSet chart4DataSet1 = new XYChart.DataSet("New Members");
-        XYChart.DataSet chart4DataSet2 = new XYChart.DataSet("Old Members");
+        XYChart.DataSet chart4DataSet1 = new XYChart.DataSet("New");
+        XYChart.DataSet chart4DataSet2 = new XYChart.DataSet("Return");
+        XYChart.DataSet chart4DataSet3 = new XYChart.DataSet("Legacy");
+        XYChart.DataSet chart4DataSet4 = new XYChart.DataSet("Differed");
         // Create a series to hold 1 or more data sets
         XYChart.Series chart4Series1 = new XYChart.Series();
         // Put data into the data set
         for(int i = 0; i < chart4Xaxis1.length; i++) {
             chart4DataSet1.add(new BarChart.Data<String, Number>(chart4Xaxis1[i], chart4Yaxis1[i]));
             chart4DataSet2.add(new BarChart.Data<String, Number>(chart4Xaxis1[i], chart4Yaxis2[i]));
+            chart4DataSet3.add(new BarChart.Data<String, Number>(chart4Xaxis1[i], chart4Yaxis3[i]));
+            chart4DataSet4.add(new BarChart.Data<String, Number>(chart4Xaxis1[i], chart4Yaxis4[i]));
         }
         // put data set into the series
-        chart4Series1.addAll(chart4DataSet1,chart4DataSet2);
+        chart4Series1.addAll(chart4DataSet1,chart4DataSet2,chart4DataSet3,chart4DataSet4);
         // put series into the chart
         chart4.setSeries(chart4Series1);
         chart4.getChartColors().setBarColorSelected(0);
-        chart4.getChartColors().setBackgroundColor(new DeviceCmyk(0, .02f, 0.15f, 0.01f));
         chart4.setChartHeight(200);
         chart4.setShowBorder(true);
-        chart4.setOutLineBars(true);
+        chart4.setOutLineBars(false);
         chart4.setAutoScale(false);
         chart4.setVerticalStart(550);
         chart4.setTitleFontSize(20);
@@ -174,8 +183,6 @@ public class BarChartExample {
         System.out.println("________________________________________________________");
         System.out.println("chart4.stroke();");
         chart4.stroke();
-        System.out.println("singleDataSet= " + chart4.isSingleDataSet());
-        System.out.println("multi-colored=" + chart4.getChartColors().isMultiColored());
         document.close();
         File file = new File(dest);
         Desktop desktop = Desktop.getDesktop(); // Gui_Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()

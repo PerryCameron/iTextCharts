@@ -34,7 +34,7 @@ public class LegendElement {
 
     private void drawLegendText() {
         textBox = new Rectangle(xStart + iconSize + spacing, yStart - (26 - (iconSize) * 0.48f), nameFloatSize, 40);
-        pdfCanvas.rectangle(textBox).stroke();
+//        pdfCanvas.rectangle(textBox).stroke();
         Canvas canvas = new Canvas(pdfCanvas, textBox);
         Paragraph paragraph = new Paragraph(elementName)
                 .setTextAlignment(TextAlignment.LEFT)
@@ -47,7 +47,7 @@ public class LegendElement {
 
     private void drawLegendIcon() {
         icon = new Rectangle(xStart, yStart, iconSize, iconSize);
-        pdfCanvas.rectangle(icon).setFillColor(iconColor).fillStroke();
+        pdfCanvas.rectangle(icon).setFillColor(iconColor).setStrokeColor(iconColor).fillStroke();
     }
 
     public void setIconSize(float iconSize) {

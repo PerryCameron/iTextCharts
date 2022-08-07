@@ -9,8 +9,8 @@ import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.properties.TextAlignment;
-import com.itextpdf.layout.properties.VerticalAlignment;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -70,6 +70,9 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     private float largestCategoryStringSize;
     private float largestValueStringSize;
 
+    // offset to the chart to draw scales chartWidth-yScaleOffset=actual chart width
+    private float yScaleOffset;
+
 
     public BarChart(PdfPage page) {
         this.pdfCanvas = new PdfCanvas(page);
@@ -109,9 +112,9 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     private void setVariables() {
         getPDFSize();
         setFont();
-
         setNumberOfDataSets();
         setChartWidth();
+        calculateYScaleOffset();
         getXStart();
         getYStart();
         getTicSpacing();
@@ -314,7 +317,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
 
     private void drawValueScale() {
         if(showYScale) {
-            drawLine(xStart + yScaleOffset(),yStart,xStart + yScaleOffset(),yStart + chartHeight);
+            drawLine(xStart + yScaleOffset,yStart,xStart + yScaleOffset,yStart + chartHeight);
             drawValueScaleMiniTics();
             drawValueScaleLabels();
         }
@@ -324,7 +327,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
      * Draws the short ticks along the value scale
      */
     private void drawValueScaleMiniTics() {
-        float xAxisStartPoint = xStart + yScaleOffset();
+        float xAxisStartPoint = xStart + yScaleOffset;
         float miniTicSize = gridLineDistance / 5;
         float yMiniTicStart = yStart;
         for (int i = 0; i < getNumberOfTics() * 5 + 1; i++) {
@@ -386,23 +389,43 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
             for(int j = 0; j < series.get(i).size(); j++) {
                 // capture the value of starting point
                 barPoints[i][j] = x;
+                System.out.print("[" + x + "]");
                 // change point for next iteration
                 x = getNewXStart(x);
             }
+            System.out.println();
         // if there is more than one dataset this creates start point for next set
-        x = (i + 1) * barWidth;
+            x = (i + 1) * barWidth;
+            // this corrects bar spacing if they don't have a border
+            if(!outLineBars)
+                x += 1 + i;
         }
+    }
+
+    /**
+     * Determines the starting location for the next bar
+     * @param x
+     * @return
+     */
+    private float getNewXStart(float x) {
+        if(series.size() == 1)
+            x = x + (barWidth + spacerWidth);
+        else {
+            x = x + (barWidth * series.size()) + (spacerWidth * series.size());
+        }
+        return x;
     }
 
     private void drawBars() {
         float offset = calculateOffset();
+        Rectangle rectangle = null;
         // iterate the series
         for(int i = 0; i < series.size(); i++) {
             // iterate though current data set
             for (int j = 0; j < series.get(i).size(); j++) {
                 // stroke the bar
                 pdfCanvas.setStrokeColor(getStrokeColor());
-                Rectangle rectangle = new Rectangle(barPoints[i][j] + offset, yStart, barWidth, calculateBarHeight(convertToFloat(series.get(i).get(j).getY())));
+                rectangle = new Rectangle(barPoints[i][j] + offset, yStart, barWidth, calculateBarHeight(convertToFloat(series.get(i).get(j).getY())));
                 pdfCanvas.rectangle(rectangle).setFillColor(chartColors.nextBarColor()).fillStroke();
             }
             // will match the color for the legend
@@ -416,7 +439,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         if(legendVisible) {
             float miniTicSize = chartHeight * 0.02f;
             float yAxisStartPoint = yStart - largestCategoryStringSize - (miniTicSize * 4);
-            calculateDataSetLegendXValue();
+            float xAxisStartPoint = calculateDataSetLegendXValue();
             LegendElement legendElement;
             for (int i = 0; i < series.size(); i++) {
                 pdfCanvas.setStrokeColor(getStrokeColor());
@@ -425,7 +448,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
                 legendElement.setFont(font);
                 legendElement.setElementName(series.get(i).getName());
                 legendElement.setIconColor(chartColors.getColorByElement(series.get(i).getColor()));
-                legendElement.setStart(xStart - 60 + legendPoints[i],yAxisStartPoint);
+                legendElement.setStart(xAxisStartPoint + legendPoints[i],yAxisStartPoint);
                 legendElement.setFontColor(chartColors.getScaleColor());
                 legendElement.stroke();
             }
@@ -434,25 +457,27 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
 
 
     // TODO
-    private void calculateDataSetLegendXValue() {
-        float effectiveChartWidth = chartWidth - yScaleOffset();
+    private float calculateDataSetLegendXValue() {
+        System.out.println("yScaleOffset= " + yScaleOffset);
+        float effectiveChartWidth = chartWidth - yScaleOffset;
         float iconSize = getIconSize();
         float totalSize = 0;
         legendPoints = new float[series.size()];
-        for(int i = 0; i < series.size(); i++) {
-            if(i < 1) {
-                legendPoints[i] = getStringLength(series.get(i).getName()) + iconSize + 4;
-                System.out.println("-put " + getStringLength(series.get(i).getName()) + " " +  iconSize + 4 + " into legendPoints[" + i + "]");
-            }
-            else
-            legendPoints[i] = legendPoints[i-1] + getStringLength(series.get(i).getName() + iconSize + 4);
-            System.out.println("legendPoints[" + i + "]=" + legendPoints[i] + " Length of String["+i+"]= " + getStringLength(series.get(i).getName()) + "icon size=" + iconSize);
-            totalSize += legendPoints[i];
+        legendPoints[0] = 0;
+        for(int i = 1; i < series.size(); i++) {
+            legendPoints[i] = legendPoints[i-1] + getStringLength(series.get(i).getName()) + (iconSize * 2) + 5;
+            totalSize += getStringLength(series.get(i).getName()) + (iconSize * 2) + 5;
         }
-        float chartMiddle = yScaleOffset() + xStart + ((chartWidth - yScaleOffset()) / 2);
+        // puts the width of the first one in, since it was left out of for loop
+        totalSize += getStringLength(series.get(0).getName()) + (iconSize * 2) + 5;
+        float chartMiddle = yScaleOffset + xStart + ((chartWidth - yScaleOffset) / 2);
+        System.out.println("The start of the chart is " + (xStart - yScaleOffset));
         System.out.println("The middle of the chart is " + chartMiddle);
-        System.out.println("Total chart Width" + effectiveChartWidth);
+        System.out.println("chart Width= " + chartWidth);
+        System.out.println("effective chart Width= " + effectiveChartWidth);
         System.out.println("Total needed Legend size=" + totalSize);
+        System.out.println("xAxisStartPoint= " + (chartMiddle - (totalSize * 0.5f)));
+        return chartMiddle - (totalSize * 0.5f);
     }
 
     /**
@@ -481,31 +506,16 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         float barArrayWidth = barPoints[row -1][col -1] + barWidth;
         // finally, calculate the offset using the starting point, the chart width, and the yScaleOffset
         // which is the width of the y scale
-        return xStart + yScaleOffset() + ((chartWidth - yScaleOffset() - barArrayWidth) / 2);
+        return xStart + yScaleOffset + ((chartWidth - yScaleOffset - barArrayWidth) / 2);
     }
-
-    /**
-     * Determines the starting location for the next bar
-     * @param x
-     * @return
-     */
-    private float getNewXStart(float x) {
-        if(series.size() == 1)
-        x = x + (barWidth + spacerWidth);
-        else {
-            x = x + (barWidth * series.size()) + (spacerWidth * series.size());
-        }
-        return x;
-    }
-
 
     /**
      * Sets the background color. Default is white
      */
     private void drawBackground() {
-        float width = chartWidth - yScaleOffset();
+        float width = chartWidth - yScaleOffset;
         pdfCanvas.setStrokeColor(chartColors.getBackgroundColor());
-        Rectangle rectangle = new Rectangle(xStart + yScaleOffset(), yStart, width, chartHeight);
+        Rectangle rectangle = new Rectangle(xStart + yScaleOffset, yStart, width, chartHeight);
         pdfCanvas.rectangle(rectangle).setFillColor(chartColors.getBackgroundColor()).fillStroke();
     }
 
@@ -513,21 +523,21 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
      * The space needed for the value scale
      * @return
      */
-    private float yScaleOffset() {
-        return (chartWidth * ((1 - BAR_CHART_RATIO) / 2));
+    private void calculateYScaleOffset() {
+        this.yScaleOffset = (chartWidth * ((1 - BAR_CHART_RATIO) / 2));
     }
 
     private void drawFrame() {
         if(showBorder) {
             pdfCanvas.setStrokeColor(chartColors.getBorderColor());
             // top
-            drawLine(xStart + yScaleOffset(),yStart + chartHeight,xStart + chartWidth,yStart + chartHeight);
+            drawLine(xStart + yScaleOffset,yStart + chartHeight,xStart + chartWidth,yStart + chartHeight);
             // right
             drawLine(xStart + chartWidth,yStart + chartHeight,xStart + chartWidth,yStart);
             // bottom
-            drawLine(xStart + chartWidth,yStart,xStart + yScaleOffset(),yStart);
+            drawLine(xStart + chartWidth,yStart,xStart + yScaleOffset,yStart);
             // left
-            drawLine(xStart + yScaleOffset(),yStart,xStart + yScaleOffset(),yStart + chartHeight);
+            drawLine(xStart + yScaleOffset,yStart,xStart + yScaleOffset,yStart + chartHeight);
         }
     }
 
@@ -572,7 +582,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
             for (int i = 0; i < getNumberOfTics(); i++) {
                 pdfCanvas.setStrokeColor(chartColors.getGridLineColor());
                 scaleHeight = scaleHeight + gridLineDistance;
-                drawLine(xStart + yScaleOffset(), scaleHeight,xStart + chartWidth, scaleHeight);
+                drawLine(xStart + yScaleOffset, scaleHeight,xStart + chartWidth, scaleHeight);
             }
         }
     }
@@ -737,6 +747,10 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         this.outLineBars = outLineBars;
     }
 
+    public boolean isOutLineBars() {
+        return outLineBars;
+    }
+
     public void setShowBorder(boolean showBorder) {
         this.showBorder = showBorder;
     }
@@ -748,12 +762,6 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     public void setShowXScale(boolean showXScale) {
         this.showXScale = showXScale;
     }
-
-
-//    @Override
-//    public ArrayList<DataSet<X, Y>> getSeries() {
-//        return series;
-//    }
 
     public void setSeries(ArrayList<DataSet<X, Y>> series) {
         this.series = series;
