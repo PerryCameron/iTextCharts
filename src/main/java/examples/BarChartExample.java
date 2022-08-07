@@ -42,18 +42,19 @@ public class BarChartExample {
         // Create the bar chart
         BarChart<String,Number> chart1 = new BarChart<>(page);
         // Create a data set for the chart
-        XYChart.DataSet dataSet1 = new XYChart.DataSet("New Members");
+        XYChart.DataSet chart1DataSet1 = new XYChart.DataSet("New Members");
         // Create a series to hold 1 or more data sets
-        XYChart.Series series1 = new XYChart.Series();
+        XYChart.Series chart1Series = new XYChart.Series();
         // Put data into the data set
         for(int i = 0; i < xaxis.length; i++)
-            dataSet1.add(new BarChart.Data<String, Number> (xaxis[i],yaxis[i]));
+            chart1DataSet1.add(new BarChart.Data<String, Number> (xaxis[i],yaxis[i]));
         // put data set into the series
-        series1.add(dataSet1);
+        chart1Series.add(chart1DataSet1);
         // put series into the chart
-        chart1.setSeries(series1);
+        chart1.setSeries(chart1Series);
         chart1.getChartColors().setBarColorSelected(0);
         chart1.getChartColors().setBackgroundColor(new DeviceCmyk(0, .02f, 0.15f, 0.01f));
+        chart1.setLegendVisible(true);
         chart1.setChartHeight(200);
         chart1.setShowBorder(true);
         chart1.setOutLineBars(true);

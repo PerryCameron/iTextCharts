@@ -92,12 +92,12 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     public void stroke() {
         setVariables();
         drawBackground();
-        printNumScaleValues();
+//        printNumScaleValues();
         drawGridLines();
         drawCategoryScale();
         drawValueScale();
         setTitle();
-        printValues();
+//        printValues();
         drawBars();
         drawFrame();
         drawLegend();
@@ -415,29 +415,19 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     private void drawLegend() {
         if(legendVisible) {
             float miniTicSize = chartHeight * 0.02f;
-            System.out.println("miniTicSize= " + miniTicSize);
             float yAxisStartPoint = yStart - largestCategoryStringSize - (miniTicSize * 4);
-            float legendIconSize = getIconSize();
-            System.out.println("legendIconSize=" + legendIconSize);
             calculateDataSetLegendXValue();
-            float chartMiddle = yScaleOffset() + xStart + ((chartWidth - yScaleOffset()) / 2);
-            System.out.println("chart middle=" + chartMiddle);
-            Rectangle rectangle;
+            LegendElement legendElement;
             for (int i = 0; i < series.size(); i++) {
                 pdfCanvas.setStrokeColor(getStrokeColor());
-                rectangle = new Rectangle(xStart - 60 + legendPoints[i], yAxisStartPoint, legendIconSize, legendIconSize);
-                pdfCanvas.rectangle(rectangle).setFillColor(chartColors.getColorByElement(series.get(i).getColor())).fillStroke();
-                // this is magic here - intuition + trial and error
-                rectangle = new Rectangle(xStart - 60 + legendPoints[i] + legendIconSize + 4, yAxisStartPoint - (26 - (legendIconSize) * 0.48f), 60, 40);
-//            pdfCanvas.rectangle(rectangle).stroke();
-                Canvas canvas = new Canvas(pdfCanvas, rectangle);
-                Paragraph paragraph = new Paragraph(series.get(i).getName())
-                        .setTextAlignment(TextAlignment.LEFT)
-                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                        .setFont(font)
-                        .setFontColor(chartColors.getScaleColor());
-                canvas.add(paragraph);
-                canvas.close();
+                legendElement = new LegendElement(pdfCanvas);
+                legendElement.setIconSize(getIconSize());
+                legendElement.setFont(font);
+                legendElement.setElementName(series.get(i).getName());
+                legendElement.setIconColor(chartColors.getColorByElement(series.get(i).getColor()));
+                legendElement.setStart(xStart - 60 + legendPoints[i],yAxisStartPoint);
+                legendElement.setFontColor(chartColors.getScaleColor());
+                legendElement.stroke();
             }
         }
     }
@@ -450,17 +440,25 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         float totalSize = 0;
         legendPoints = new float[series.size()];
         for(int i = 0; i < series.size(); i++) {
-            if(i < 1)
-            legendPoints[i] = getStringLength(series.get(i).getName() + iconSize + 4);
+            if(i < 1) {
+                legendPoints[i] = getStringLength(series.get(i).getName()) + iconSize + 4;
+                System.out.println("-put " + getStringLength(series.get(i).getName()) + " " +  iconSize + 4 + " into legendPoints[" + i + "]");
+            }
             else
             legendPoints[i] = legendPoints[i-1] + getStringLength(series.get(i).getName() + iconSize + 4);
-            System.out.println("legendPoints[" + i + "]=" + legendPoints[i]);
+            System.out.println("legendPoints[" + i + "]=" + legendPoints[i] + " Length of String["+i+"]= " + getStringLength(series.get(i).getName()) + "icon size=" + iconSize);
             totalSize += legendPoints[i];
         }
+        float chartMiddle = yScaleOffset() + xStart + ((chartWidth - yScaleOffset()) / 2);
+        System.out.println("The middle of the chart is " + chartMiddle);
         System.out.println("Total chart Width" + effectiveChartWidth);
         System.out.println("Total needed Legend size=" + totalSize);
     }
 
+    /**
+     * sizes the legend icon depending on the size of the bars
+     * @return
+     */
     private float getIconSize() {
         float size;
         if(barWidth > 12)
