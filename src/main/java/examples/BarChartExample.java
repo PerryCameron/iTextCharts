@@ -15,8 +15,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class BarChartExample {
-        // TODO bars overlap when not outlined
-        // TODO if legend text is different size the gaps are different
     public static void main(String[] args) {
         // Initialize PDF writer
         PdfWriter writer = null;

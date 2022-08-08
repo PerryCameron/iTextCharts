@@ -10,7 +10,6 @@ import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.properties.TextAlignment;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -226,8 +225,6 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         this.pdfPageHeight = thisPage.getHeight();
         this.pdfPageWidth = thisPage.getWidth();
     }
-
-
 
     /**
      * Draws the X scale, calls setXScaleMiniTics() method as well as setXScaleLabels()
@@ -462,14 +459,22 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         float effectiveChartWidth = chartWidth - yScaleOffset;
         float iconSize = getIconSize();
         float totalSize = 0;
+        // starts with length needed for first element
+        float longestSize = getStringLength(series.get(0).getName()) + (iconSize * 2) + 5;
+        float currentSize = 0;
         legendPoints = new float[series.size()];
         legendPoints[0] = 0;
+        // gets the largest of all of them
         for(int i = 1; i < series.size(); i++) {
-            legendPoints[i] = legendPoints[i-1] + getStringLength(series.get(i).getName()) + (iconSize * 2) + 5;
-            totalSize += getStringLength(series.get(i).getName()) + (iconSize * 2) + 5;
+            currentSize = getStringLength(series.get(i).getName()) + (iconSize * 2) + 5;
+            if(currentSize > longestSize) longestSize = currentSize;
+        }
+        // this loop must be second because you need to make sure you have the largest currentSize
+        for(int i = 1; i < series.size(); i++) {
+            legendPoints[i] = legendPoints[i-1] + currentSize;
         }
         // puts the width of the first one in, since it was left out of for loop
-        totalSize += getStringLength(series.get(0).getName()) + (iconSize * 2) + 5;
+        totalSize = longestSize * series.size();
         float chartMiddle = yScaleOffset + xStart + ((chartWidth - yScaleOffset) / 2);
         System.out.println("The start of the chart is " + (xStart - yScaleOffset));
         System.out.println("The middle of the chart is " + chartMiddle);
@@ -747,10 +752,6 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         this.outLineBars = outLineBars;
     }
 
-    public boolean isOutLineBars() {
-        return outLineBars;
-    }
-
     public void setShowBorder(boolean showBorder) {
         this.showBorder = showBorder;
     }
@@ -771,19 +772,9 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         return singleDataSet;
     }
 
-    public void setSingleDataSet(boolean singleDataSet) {
-        this.singleDataSet = singleDataSet;
-    }
-
-    public boolean isLegendVisible() {
-        return legendVisible;
-    }
-
     public void setLegendVisible(boolean legendVisible) {
         this.legendVisible = legendVisible;
     }
-
-
 
     public static class BarChartBuilder {
         private PdfPage nestedPage;
