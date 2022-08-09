@@ -74,10 +74,10 @@ public class BarChartExample {
         float[] chart2Yaxis3 = { 140, 120, 100, 220, 140 };
         float[] chart2Yaxis4 = { 145, 140, 110, 200, 150 };
         BarChart<String,Number> chart2 = new BarChart<>(page);
-        XYChart.DataSet chart2DataSet1 = new XYChart.DataSet("2001");
-        XYChart.DataSet chart2DataSet2 = new XYChart.DataSet("2002");
-        XYChart.DataSet chart2DataSet3 = new XYChart.DataSet("2003");
-        XYChart.DataSet chart2DataSet4 = new XYChart.DataSet("2004");
+        XYChart.DataSet chart2DataSet1 = new XYChart.DataSet("2001 Year of");
+        XYChart.DataSet chart2DataSet2 = new XYChart.DataSet("2002 Year of");
+        XYChart.DataSet chart2DataSet3 = new XYChart.DataSet("2003 Year of");
+        XYChart.DataSet chart2DataSet4 = new XYChart.DataSet("2004 Year of");
         XYChart.Series chart2Series = new XYChart.Series();
         for(int i = 0; i < chart2Xaxis1.length; i++) {
             chart2DataSet1.add(new BarChart.Data<String, Number>(chart2Xaxis1[i], chart2Yaxis1[i]));

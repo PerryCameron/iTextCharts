@@ -15,8 +15,7 @@ public class LegendElement {
     private float nameFloatSize;
     private float iconSize;
     private float spacing = 5;
-    private float xStart;
-    private float yStart;
+    private Point startPoint;
     private Rectangle icon;
     private Rectangle textBox;
     private DeviceCmyk iconColor;
@@ -33,7 +32,7 @@ public class LegendElement {
     }
 
     private void drawLegendText() {
-        textBox = new Rectangle(xStart + iconSize + spacing, yStart - (26 - (iconSize) * 0.48f), nameFloatSize, 40);
+        textBox = new Rectangle(startPoint.getX() + iconSize + spacing, startPoint.getY() - (26 - (iconSize) * 0.48f), nameFloatSize, 40);
 //        pdfCanvas.rectangle(textBox).stroke();
         Canvas canvas = new Canvas(pdfCanvas, textBox);
         Paragraph paragraph = new Paragraph(elementName)
@@ -46,17 +45,12 @@ public class LegendElement {
     }
 
     private void drawLegendIcon() {
-        icon = new Rectangle(xStart, yStart, iconSize, iconSize);
+        icon = new Rectangle(startPoint.getX(), startPoint.getY(), iconSize, iconSize);
         pdfCanvas.rectangle(icon).setFillColor(iconColor).setStrokeColor(iconColor).fillStroke();
     }
 
     public void setIconSize(float iconSize) {
         this.iconSize = iconSize;
-    }
-
-    public void setStart(float x, float y) {
-        this.xStart = x;
-        this.yStart = y;
     }
 
     public void setIconColor(DeviceCmyk iconColor) {
@@ -83,5 +77,9 @@ public class LegendElement {
             length += font.getWidth(c,12); // TODO make font size changeable
         }
         return length;
+    }
+
+    public void setStartPoint(Point startPoint) {
+        this.startPoint = startPoint;
     }
 }

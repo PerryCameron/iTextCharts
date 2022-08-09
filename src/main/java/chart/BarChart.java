@@ -63,7 +63,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     // all points for start of category mini tics
     private float []categoryMiniTics;
     // font used for entire chart
-    private float []legendPoints;
+    private Point[]legendPoints;
     private PdfFont font;
 
     private float largestCategoryStringSize;
@@ -187,6 +187,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         Canvas canvas = new Canvas(pdfCanvas, rectangle);
         canvas.add(new Paragraph(String.valueOf(title))
                 .setTextAlignment(TextAlignment.CENTER)
+                .setFont(font)
                 .setFontColor(chartColors.getScaleColor())
                 .setFontSize(titleFontSize));
         canvas.close();
@@ -386,11 +387,9 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
             for(int j = 0; j < series.get(i).size(); j++) {
                 // capture the value of starting point
                 barPoints[i][j] = x;
-                System.out.print("[" + x + "]");
                 // change point for next iteration
                 x = getNewXStart(x);
             }
-            System.out.println();
         // if there is more than one dataset this creates start point for next set
             x = (i + 1) * barWidth;
             // this corrects bar spacing if they don't have a border
@@ -434,8 +433,6 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
 
     private void drawLegend() {
         if(legendVisible) {
-            float miniTicSize = chartHeight * 0.02f;
-            float yAxisStartPoint = yStart - largestCategoryStringSize - (miniTicSize * 4);
             float xAxisStartPoint = calculateDataSetLegendXValue();
             LegendElement legendElement;
             for (int i = 0; i < series.size(); i++) {
@@ -445,7 +442,7 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
                 legendElement.setFont(font);
                 legendElement.setElementName(series.get(i).getName());
                 legendElement.setIconColor(chartColors.getColorByElement(series.get(i).getColor()));
-                legendElement.setStart(xAxisStartPoint + legendPoints[i],yAxisStartPoint);
+                legendElement.setStartPoint(legendPoints[i]);
                 legendElement.setFontColor(chartColors.getScaleColor());
                 legendElement.stroke();
             }
@@ -453,26 +450,38 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
     }
 
 
-    // TODO
+    // TODO make legends split if too long
+
+    /**
+     * Calculates points to start legend values
+     * @return
+     */
     private float calculateDataSetLegendXValue() {
         System.out.println("yScaleOffset= " + yScaleOffset);
+        float miniTicSize = chartHeight * 0.02f;
+        float yAxisStartPoint = yStart - largestCategoryStringSize - (miniTicSize * 4);
+        float xAxisStartPoint;
         float effectiveChartWidth = chartWidth - yScaleOffset;
         float iconSize = getIconSize();
         float totalSize = 0;
         // starts with length needed for first element
         float longestSize = getStringLength(series.get(0).getName()) + (iconSize * 2) + 5;
         float currentSize = 0;
-        legendPoints = new float[series.size()];
-        legendPoints[0] = 0;
+        legendPoints = new Point[series.size()];
+        legendPoints[0] = new Point(0.0f,yAxisStartPoint);
         // gets the largest of all of them
         for(int i = 1; i < series.size(); i++) {
             currentSize = getStringLength(series.get(i).getName()) + (iconSize * 2) + 5;
             if(currentSize > longestSize) longestSize = currentSize;
         }
         // this loop must be second because you need to make sure you have the largest currentSize
+        System.out.print(legendPoints[0].toString());
         for(int i = 1; i < series.size(); i++) {
-            legendPoints[i] = legendPoints[i-1] + currentSize;
+            xAxisStartPoint = legendPoints[i-1].getX() + currentSize;
+            legendPoints[i] = new Point(xAxisStartPoint,yAxisStartPoint);
+            System.out.print(legendPoints[i].toString());
         }
+        System.out.println();
         // puts the width of the first one in, since it was left out of for loop
         totalSize = longestSize * series.size();
         float chartMiddle = yScaleOffset + xStart + ((chartWidth - yScaleOffset) / 2);
@@ -818,6 +827,5 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         public BarChart createBarChart() {
             return new BarChart(nestedPage,nestedChartHeight,nestedChartWidth,nestedXStart,nestedYStart);
         }
-
     }
 }
