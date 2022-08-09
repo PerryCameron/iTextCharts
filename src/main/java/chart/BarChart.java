@@ -546,6 +546,13 @@ public class BarChart<X, Y> extends XYChart<X,Y> {
         }
     }
 
+    /**
+     * A function to reduce lines of code, draws a line
+     * @param xStart
+     * @param yStart
+     * @param xStop
+     * @param yStop
+     */
     private void drawLine(float xStart,float yStart, float xStop, float yStop) {
         pdfCanvas.moveTo(xStart, yStart);
         pdfCanvas.lineTo(xStop,yStop);
